@@ -1,0 +1,21 @@
+name: lola-sport-demo
+services:
+  postgres:
+    image: postgres:17-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-lola}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Run setup to create the local environment}
+      POSTGRES_DB: ${POSTGRES_DB:-lola_demo}
+    ports:
+      - "127.0.0.1:${POSTGRES_PORT:-55433}:5432"
+    volumes:
+      - lola_demo_postgres:/var/lib/postgresql/data
+      - ./infra/postgres/01-test-database.sql:/docker-entrypoint-initdb.d/01-test-database.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
+      interval: 3s
+      timeout: 3s
+      retries: 20
+volumes:
+  lola_demo_postgres:

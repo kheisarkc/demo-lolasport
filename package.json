@@ -1,0 +1,32 @@
+{
+  "name": "lola-sport-demo",
+  "version": "0.1.0",
+  "private": true,
+  "workspaces": [
+    "apps/web"
+  ],
+  "engines": {
+    "node": ">=22.16.0"
+  },
+  "scripts": {
+    "dev": "node scripts/project.mjs dev",
+    "setup": "node scripts/project.mjs setup",
+    "doctor": "node scripts/project.mjs doctor",
+    "check": "node scripts/project.mjs check",
+    "check:all": "npm run check && npm run test:e2e",
+    "build": "npm run build --workspace apps/web",
+    "db:up": "node scripts/project.mjs db:up",
+    "db:stop": "node scripts/project.mjs db:stop",
+    "api": "node scripts/project.mjs artisan",
+    "test:api": "node scripts/project.mjs test:api",
+    "test:e2e": "node scripts/project.mjs test:e2e",
+    "test:e2e:ui": "node scripts/project.mjs test:e2e --ui",
+    "specify": "node scripts/project.mjs specify",
+    "agent:run": "node scripts/project.mjs agent:run"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.64.1",
+    "@playwright/cli": "0.1.22",
+    "@upstash/context7-mcp": "4.4.2"
+  }
+}

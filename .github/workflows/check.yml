@@ -1,0 +1,62 @@
+name: Checks
+on:
+  push:
+  pull_request:
+permissions:
+  contents: read
+jobs:
+  quality:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:17-alpine
+        env:
+          POSTGRES_USER: lola
+          POSTGRES_PASSWORD: testing-only
+          POSTGRES_DB: lola_demo
+        ports:
+          - 55433:5432
+        options: >-
+          --health-cmd "pg_isready -U lola -d lola_demo"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    env:
+      PLAYWRIGHT_BROWSERS_PATH: .runtime/browsers
+      LOLA_DATABASE_EXTERNAL: '1'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+          extensions: pdo_pgsql, mbstring, dom, curl, xml
+          coverage: none
+      - run: composer install --no-interaction --prefer-dist
+        working-directory: apps/api
+      - run: npm ci
+      - name: Configure isolated environments
+        run: |
+          cp .env.example .env
+          sed -i 's/change-this-local-password/testing-only/' .env
+          psql -h 127.0.0.1 -p 55433 -U lola -d lola_demo -c 'CREATE DATABASE lola_demo_test;'
+          node scripts/project.mjs configure
+        env:
+          PGPASSWORD: testing-only
+      - run: npm run check
+      - name: Browser checks
+        run: |
+          node node_modules/@playwright/test/cli.js install --with-deps chromium
+          npm run test:e2e
+        env:
+          LOLA_DATABASE_EXTERNAL: '1'
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: failure-evidence
+          path: |
+            playwright-report/
+            test-results/

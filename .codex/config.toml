@@ -1,0 +1,9 @@
+# Project-local MCP. Processes resolve paths from the demo root.
+[mcp_servers.laravel-boost]
+command = 'node'
+args = ['scripts/boost-mcp.mjs']
+startup_timeout_sec = 30
+[mcp_servers.context7]
+command = 'node'
+args = ['node_modules/@upstash/context7-mcp/dist/index.js']
+startup_timeout_sec = 30
