@@ -9,3 +9,5 @@ Laravel owns domain/otorisasi/transaksi/persistence. Next App Router TypeScript 
 Aturan sementara di DEMO-ASSUMPTIONS.md menggantikan keputusan bisnis terbuka hanya untuk simulasi ini. Spec dan acceptance scenario di specs/001-demo/spec.md; plan/tasks/hasil pemeriksaan di folder sama.
 
 Hasil akhir harus dapat dijalankan lokal dengan akun fiktif, sumber mandiri, database/runtime/rahasia terpisah, satu perintah jalan dan verifikasi aktual. Produksi, gateway, refund, pindah jadwal, deployment dan UAT pengelola tidak termasuk.
+
+Redesign mobile terbaru mengikuti specs/002-mobile-redesign: alur pelanggan, agenda/verifikasi pegawai dan penerimaan pemilik, URL nyata dan pengujian responsive. Aturan simulasi tetap DEMO-ASSUMPTIONS; tidak ada klaim bisnis/tempat/ulasan/fasilitas baru.

@@ -16,6 +16,7 @@ apps/api/storage/framework/views/*
 apps/api/.phpunit.result.cache
 apps/api/.phpunit.cache/
 apps/web/.next/
+apps/web/.next-e2e/
 apps/web/out/
 apps/web/next-env.d.ts
 *.tsbuildinfo

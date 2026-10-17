@@ -1,4 +1,5 @@
 import { expect, test } from '@playwright/test';
+import { noOverflow } from './helpers';
 
 test('the frontend can reach Laravel and PostgreSQL', async ({ request }) => {
   const response = await request.get('/api/health');
@@ -6,11 +7,10 @@ test('the frontend can reach Laravel and PostgreSQL', async ({ request }) => {
   expect(await response.json()).toMatchObject({ status: 'ok', database: 'connected' });
 });
 
-test('the demo catalog is readable without horizontal overflow', async ({ page }, testInfo) => {
+test('the demo catalog is readable without horizontal overflow', async ({ page }) => {
   await page.goto('/');
-  await expect(page.getByRole('heading', { name: 'Waktunya turun ke lapangan.' })).toBeVisible();
-  await expect(page.getByRole('heading', { name: 'Pilih jadwal main' })).toBeVisible();
-  await expect(page.getByText('Lingkungan demo lokal')).toBeVisible();
-  expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
-  await page.screenshot({ path: testInfo.outputPath('catalog.png'), fullPage: true });
+  await expect(page.getByRole('heading', { name: 'Cari waktu mainmu' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Futsal Arena', exact: true })).toBeVisible();
+  await expect(page.getByText('Demo lokal', { exact: true })).toBeVisible();
+  await noOverflow(page);
 });

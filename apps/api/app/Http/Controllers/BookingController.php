@@ -27,7 +27,7 @@ class BookingController extends Controller
         Gate::authorize('view', $booking);
         $service->expire();
 
-        return response()->json($booking->refresh()->load('court', 'payments', 'events'));
+        return response()->json([...$booking->refresh()->load('court', 'payments', 'events')->toArray(), 'server_now' => now()->toIso8601String()]);
     }
 
     public function store(Request $request, BookingService $service): JsonResponse

@@ -19,6 +19,13 @@ class AppServiceProvider extends ServiceProvider
         Gate::define('staff', fn ($user) => $user->role === 'staff');
         Gate::define('owner', fn ($user) => $user->role === 'owner');
         RateLimiter::for('login', fn (Request $request) => Limit::perMinute(15)->by(strtolower((string) $request->input('email')).'|'.$request->ip()));
+        if ($this->app->environment('e2e') && (config('database.default') !== 'pgsql'
+            || config('database.connections.pgsql.database') !== 'lola_demo_test'
+            || config('database.connections.pgsql.host') !== '127.0.0.1'
+            || (string) config('database.connections.pgsql.port') !== '55433'
+            || DB::selectOne('select current_database() as name')->name !== 'lola_demo_test')) {
+            throw new RuntimeException('Browser tests require the isolated lola_demo_test PostgreSQL database.');
+        }
         $command = $_SERVER['argv'][1] ?? '';
         if ($this->app->runningInConsole() && (str_starts_with($command, 'migrate') || $command === 'db:seed')) {
             $expected = $this->app->environment('testing') ? 'lola_demo_test' : 'lola_demo';

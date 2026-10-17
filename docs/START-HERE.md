@@ -9,3 +9,5 @@ Ruang lingkup demo lengkap: akun, lapangan/jadwal, reservasi, pembayaran manual 
 
 Perintah: `npm run doctor`, `npm run check`, `npm run test:e2e`, `npm run api -- route:list`, `npm run db:stop`.
 Database demo `lola_demo`, tes `lola_demo_test`, port 55433. API 8001, web 3001. Rahasia/runtime/upload/hasil tes tidak masuk Git. Tidak ada PDF atau ekstraksi proposal yang disimpan dalam source.
+
+Untuk UI terbaru lihat specs/002-mobile-redesign. Jalur awal pegawai /pegawai, pemilik /pemilik/laporan, pelanggan /. E2E sekarang memakai layanan/database tes terisolasi; jangan jalankan bersamaan dengan backend check.

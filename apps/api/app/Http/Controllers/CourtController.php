@@ -25,14 +25,15 @@ class CourtController extends Controller
             for ($hour = $court->open_hour; $hour < $court->close_hour; $hour++) {
                 $start = $day->setHour($hour)->utc();
                 $end = $start->addHour();
-                $available = $start->isFuture() && ! $busy->contains(fn (Booking $b) => $b->starts_at->lt($end) && $b->ends_at->gt($start));
-                $slots[] = ['hour' => $hour, 'available' => $available];
+                $occupied = $busy->first(fn (Booking $b) => $b->starts_at->lt($end) && $b->ends_at->gt($start));
+                $status = $occupied ? ($occupied->source === 'block' ? 'blocked' : 'booked') : ($start->isFuture() ? 'available' : 'past');
+                $slots[] = ['hour' => $hour, 'available' => $status === 'available', 'status' => $status];
             }
 
             return [...$court->toArray(), 'slots' => $slots];
         });
 
-        return response()->json(['date' => $date, 'timezone' => 'Asia/Jakarta', 'courts' => $courts, 'dp_percent' => config('demo.dp_percent'), 'hold_minutes' => config('demo.hold_minutes')]);
+        return response()->json(['date' => $date, 'server_now' => now()->toIso8601String(), 'timezone' => 'Asia/Jakarta', 'courts' => $courts, 'dp_percent' => config('demo.dp_percent'), 'hold_minutes' => config('demo.hold_minutes')]);
     }
 
     public function all(): JsonResponse

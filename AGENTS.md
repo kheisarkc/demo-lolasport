@@ -44,3 +44,7 @@
 - Avoid multiple orchestration frameworks. OpenSpec, BMad, and GSD are not installed alongside Spec Kit.
 - Do not alter global Codex permissions, disable sandboxing, or create recurring automations unless separately requested.
 - Local continuous execution still depends on a running host, valid sign-in, available usage, and tool approval decisions.
+
+## Active UI redesign
+- Redesign mobile seluruh peran mengikuti specs/002-mobile-redesign; aturan domain tetap specs/001-demo dan docs/DEMO-ASSUMPTIONS.md.
+- Browser tests memakai layanan test terpisah3002/8002 dan lola_demo_test, dengan guard sebelum cleanup. Jangan menjalankan backend check dan E2E bersamaan.

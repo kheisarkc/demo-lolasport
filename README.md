@@ -35,8 +35,8 @@ Data registrasi tambahan harus fiktif. Akun contoh ini hanya untuk demo lokal.
 
 1. Masuk sebagai pelanggan, pilih tanggal mendatang dan jam tersedia, lalu buat reservasi. Lihat tenggat hold dan minimum DP pada detail.
 2. Pilih transfer/QRIS demo, masukkan DP atau total, unggah bukti fiktif PNG/JPG/PDF maksimal 2 MB. Tidak ada rekening/QR aktif atau payment gateway. Bukti belum dihitung sebagai penerimaan.
-3. Keluar dan masuk sebagai pegawai. Buka **Reservasi & verifikasi**, pilih detail, unduh bukti, lalu setujui atau tolak dengan alasan. DP diterima mengonfirmasi reservasi.
-4. Pelanggan mengajukan pelunasan tepat sisa tagihan; pegawai menyetujuinya. Pegawai juga dapat mencatat tunai, walk-in dan blok pemeliharaan melalui **Jadwal & walk-in**.
+3. Keluar dan masuk sebagai pegawai. Buka **Verifikasi**, pilih detail, unduh bukti, lalu setujui atau tolak dengan alasan. DP diterima mengonfirmasi reservasi.
+4. Pelanggan mengajukan pelunasan tepat sisa tagihan; pegawai menyetujuinya. Pegawai juga dapat mencatat tunai, walk-in dan blok pemeliharaan melalui **Jadwal**.
 5. Pemilik membuka **Penerimaan pembayaran**, memilih tanggal persetujuan WIB, lalu mencocokkan total dengan rincian. DP dan pelunasan masuk masing-masing sekali. Pembatalan tanpa refund tetap masuk penerimaan.
 
 Pegawai mengubah master pada **Kelola lapangan**. Harga lama tersimpan pada transaksi. Perubahan jam/nonaktif yang mematahkan booking aktif akan ditolak. Pembatalan hanya sebelum mulai, tanpa refund/pindah jadwal pada simulasi ini.
@@ -51,8 +51,23 @@ npm run check
 npm run test:e2e
 ```
 
-`check` mencakup Pint, Pest/PostgreSQL termasuk dua proses konkurensi, PHPStan, ESLint, TypeScript dan build. E2E memakai Chromium desktop/Pixel 7, akun serta transaksi fiktif baru tanpa reset database demo. Tes backend hanya boleh membersihkan `lola_demo_test`; guard memeriksa nama, host, port dan koneksi sebelum pembersihan. Jangan menjalankan reset database operasional.
+`check` mencakup Pint, Pest/PostgreSQL termasuk dua proses konkurensi, PHPStan, ESLint, TypeScript dan build. E2E memakai Chromium desktop/Pixel 7 serta transaksi fiktif pada database tes terisolasi. Tes backend hanya boleh membersihkan `lola_demo_test`; guard memeriksa nama, host, port dan koneksi sebelum pembersihan. Jangan menjalankan reset database operasional.
 
 Spec/plan/tasks: `specs/001-demo/`. Asumsi: `docs/DEMO-ASSUMPTIONS.md`. Hasil aktual dan keterbatasan: `specs/001-demo/verification.md` serta `docs/STATE.md`. Riwayat awal README GitHub dipertahankan dalam commit d8b230c. Fondasi diambil dari snapshot Git; repo induk hanya diberi pengecualian lokal untuk folder demo.
 
 Ini eksperimen lokal dengan aturan simulasi sementara. Belum UAT pengelola dan belum siap produksi. Tidak ada push atau deployment.
+
+## Redesign mobile
+
+UI sekarang memakai halaman yang bisa dibuka langsung, di-refresh, dan dinavigasi dengan Back:
+
+- Pelanggan: `/`, `/checkout`, `/reservasi`, `/reservasi/[id]`, `/masuk`, `/daftar`.
+- Pegawai: `/pegawai` (hari ini), `/pegawai/jadwal`, `/pegawai/verifikasi`, `/pegawai/lapangan`, dan `/pegawai/reservasi`.
+- Pemilik: `/pemilik/laporan` dengan periode cepat atau rentang khusus.
+- Semua peran: `/akun` untuk melihat akun dan keluar.
+
+Pada HP, pilihan jadwal tampil dalam ringkasan bawah; login mempertahankan pilihan menuju checkout dan tidak otomatis membuat reservasi. Pegawai memakai agenda per lapangan, antrean bukti dengan preview/perbesar, serta editor master yang hanya dibuka saat dibutuhkan. Laporan memakai kartu transaksi pada HP, tabel pada desktop, dan komponen DP/pelunasan/bayar penuh yang menjumlah total approved.
+
+Pengujian browser redesign memakai **layanan khusus 3002/8002 dan `lola_demo_test`**. Runner memeriksa database sebelum membersihkan database tes, membangun Next ke `.next-e2e`, lalu menjalankan build tersebut. Cookie, storage dan bukti tes terpisah; `lola_demo` tidak di-reset atau diisi E2E redesign. Jangan menjalankan tes backend dan browser bersamaan karena keduanya memakai database tes yang sama.
+
+Screenshot lokal: `.runtime/reports/redesign/before/` dan `.runtime/reports/redesign/after/`. Spec/plan/tasks terbaru: `specs/002-mobile-redesign/`. Hasil aktual redesign dicatat pada `specs/002-mobile-redesign/verification.md`; bukti fitur001 tetap menjadi riwayat pengujian versi sebelumnya.

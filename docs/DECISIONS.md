@@ -11,3 +11,8 @@
 - D-009: Spec Kit workflow tunggal. MCP yang tersedia boleh dibaca; tools yang tidak termuat memakai vendor/dokumentasi resmi lokal tanpa mengubah global settings.
 
 Keputusan pengelola untuk produksi, kebijakan komersial nyata dan UAT tetap belum diperoleh. Hasil pengujian internal dicatat terpisah.
+
+- D-010: Redesign18Oktober2026 dilakukan langsung di repo demo. URL App Router menggantikan view state tunggal; filter/niat booking nonrahasia tersimpan pada query. Checkout memeriksa ulang slot/harga dan memerlukan tindakan final.
+- D-011: UI mobile terang memakai identitas hijau lapangan, tab tanggal/slot tekstual, bottom nav, sticky selection, agenda pegawai, antrean bukti dan kartu penerimaan. Referensi diadaptasi dari pola yang diberikan pengguna, tanpa menyalin kode/aset eksternal.
+- D-012: API additive menyediakan status slot, jam server, dan kategori penerimaan. DP/pelunasan/bayar penuh ditentukan dari seluruh riwayat approved lalu diakumulasi pada filter; aturan penerimaan/otorisasi tetap.
+- D-013: E2E redesign hanya lola_demo_test melalui layanan3002/8002 terpisah. Pembersihan tes dijaga sebelum migrasi. Next test memakai build/start dan storage/cookie sendiri; demo3001/8001 tetap tersedia.

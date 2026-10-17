@@ -1,5 +1,5 @@
 import { spawn, spawnSync } from 'node:child_process';
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { createWriteStream, existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { randomBytes } from 'node:crypto';
@@ -113,6 +113,41 @@ async function dev() {
   for (const child of children) child.once('exit', code => { stop(); process.exitCode = code ?? 1; });
   console.log('Lola Sport: http://127.0.0.1:3001');
 }
+async function e2eServer() {
+  configure();
+  const webPort = Number(env.LOLA_E2E_WEB_PORT || 3002);
+  const apiPort = Number(env.LOLA_E2E_API_PORT || 8002);
+  for (const port of [webPort, apiPort]) if (!(await portIsFree(port))) throw new Error(`Test port ${port} is occupied; refusing to reuse or stop another process.`);
+  if (env.LOLA_DATABASE_EXTERNAL !== '1') compose(['up', '-d', '--wait']);
+  // The testing environment and Laravel guards verify the actual database before migrations/seed.
+  artisan(['migrate:fresh', '--env=testing', '--seed', '--no-interaction']);
+  const testEnv = join(api, '.env.e2e');
+  const storage = join(runtime, 'e2e-storage');
+  for (const folder of ['app/private', 'app/public', 'framework/sessions', 'framework/views', 'framework/cache/data', 'logs']) mkdirSync(join(storage, folder), { recursive: true });
+  const existingKey = readEnv(testEnv).APP_KEY || `base64:${randomBytes(32).toString('base64')}`;
+  writeFileSync(testEnv, fill(join(api, '.env.testing'), { APP_ENV: 'e2e', APP_KEY: existingKey, APP_URL: `http://127.0.0.1:${apiPort}`, FRONTEND_URL: `http://127.0.0.1:${webPort}`, SANCTUM_STATEFUL_DOMAINS: `127.0.0.1:${webPort}`, SESSION_DRIVER: 'file', SESSION_COOKIE: 'lola_demo_e2e_session', CACHE_STORE: 'file' }));
+  mkdirSync(join(runtime, 'reports'), { recursive: true });
+  const serviceLog = createWriteStream(join(runtime, 'reports/e2e-services.log'), { flags: 'w' });
+  const log = message => serviceLog.write(`${new Date().toISOString()} ${message}\n`);
+  const children = []; let stopping = false;
+  const stop = () => { if (stopping) return; stopping = true; for (const child of children) { if (!child.pid || child.exitCode !== null) continue; if (windows) spawnSync('taskkill', ['/PID', String(child.pid), '/T', '/F'], { windowsHide: true, stdio: 'ignore' }); else child.kill(); } };
+  process.on('SIGINT', () => { stop(); process.exit(0); }); process.on('SIGTERM', () => { stop(); process.exit(0); });
+  const backend = spawn(php, ['artisan', 'serve', '--env=e2e', '--host=127.0.0.1', `--port=${apiPort}`, '--no-reload'], { cwd: api, env: { ...env, APP_ENV: 'e2e', LARAVEL_STORAGE_PATH: storage }, stdio: ['ignore', 'pipe', 'pipe'], windowsHide: true });
+  log(`PHP parent ${backend.pid}`);
+  backend.stdout.on('data', data => { serviceLog.write(data); process.stdout.write(data); });
+  backend.stderr.on('data', data => { serviceLog.write(data); process.stderr.write(data); });
+  children.push(backend);
+  backend.on('error', error => { console.error(error.message); stop(); process.exitCode = 1; });
+  try { await waitHttp(`http://127.0.0.1:${apiPort}/api/v1/health`); } catch (error) { stop(); throw error; }
+  const browserEnv = { ...env, LOLA_E2E: '1', LARAVEL_API_URL: `http://127.0.0.1:${apiPort}` };
+  try { run(process.execPath, [join(root, 'node_modules/next/dist/bin/next'), 'build'], web, { env: browserEnv }); }
+  catch (error) { stop(); throw error; }
+  const frontend = spawn(process.execPath, [join(root, 'node_modules/next/dist/bin/next'), 'start', '--hostname', '127.0.0.1', '--port', String(webPort)], { cwd: web, env: browserEnv, stdio: 'inherit', windowsHide: true });
+  children.push(frontend);
+  frontend.on('error', error => { console.error(error.message); stop(); process.exitCode = 1; });
+  for (const child of children) child.once('exit', (code, signal) => { log(`Child ${child.pid} exited: ${code} ${signal}`); stop(); process.exitCode = code ?? 1; });
+  console.log(`Browser test services use lola_demo_test: http://127.0.0.1:${webPort}`);
+}
 function doctor() {
   run(php, ['-v']);
   run(php, ['-r', 'if (!extension_loaded("pdo_pgsql")) { fwrite(STDERR,"pdo_pgsql is missing\\n"); exit(1); } echo "pdo_pgsql ready\\n";']);
@@ -126,6 +161,7 @@ function doctor() {
 const [command = 'doctor', ...args] = process.argv.slice(2);
 try {
   if (command === 'dev') await dev();
+  else if (command === 'e2e:serve') await e2eServer();
   else if (command === 'doctor') doctor();
   else if (command === 'db:up') { configure(); compose(['up', '-d', '--wait']); }
   else if (command === 'db:stop') compose(['stop']);
@@ -146,6 +182,7 @@ try {
     run(php, ['vendor/bin/phpstan', 'analyse', '--memory-limit=1G', '--no-progress'], api);
     npm(['run', 'lint', '--workspace', 'apps/web']);
     npm(['run', 'typecheck', '--workspace', 'apps/web']);
+    run(process.execPath, [join(root, 'node_modules/typescript/bin/tsc'), '--project', join(root, 'tsconfig.e2e.json')]);
     npm(['run', 'build', '--workspace', 'apps/web']);
   }
   else if (command === 'specify') run(windows ? join(runtime, 'specify/Scripts/specify.exe') : join(runtime, 'specify/bin/specify'), args);
