@@ -23,6 +23,8 @@ apps/web/next-env.d.ts
 playwright-report/
 test-results/
 .playwright-cli/
+.playwright/
+/OPEN-CODEX.cmd
 # Personal AI/editor workflow stays local, including generated agent instructions.
 .agents/
 .codex/

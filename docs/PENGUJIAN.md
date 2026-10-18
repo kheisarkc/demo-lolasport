@@ -36,7 +36,7 @@ Source tes: [backend](../apps/api/tests), [konkurensi](../apps/api/tests/Concurr
 - `npm run test:e2e`: exit 0; **19 passed, 1 skipped, 5,4 menit**. Alur pelanggan sampai laporan serta operasional pegawai/error diuji pada desktop dan emulasi Pixel7. Skip hanya pengulangan matriks viewport pada proyek mobile; matriks lengkap sudah berjalan pada proyek desktop. Tidak ada tes yang diubah agar hasilnya lulus.
 - Kedua tes dijalankan berurutan pada **lola_demo_test** dengan guard. Tidak mereset lola_demo atau menghapus volume.
 
-103 paket npm dan 7 paket Composer khusus AI/transitif tidak terpakai dilepas, tanpa mengubah versi paket lain. Daftar 154 file source yang dibagikan dan 65 tautan relatif diperiksa; tidak ada file agent, `.env` aktual, database, runtime, dependency terpasang atau nilai rahasia lokal dalam kandidat publikasi. 132 file instruksi/config/arsip kerja dikeluarkan dari Git dengan salinan lokal dipertahankan. Riwayat Git tidak ditulis ulang; commit lama tetap merupakan sejarah, bukan isi source utama saat ini.
+103 paket npm dan 7 paket Composer khusus AI/transitif tidak terpakai dilepas, tanpa mengubah versi paket lain. Daftar 152 file source yang dibagikan dan 74 tautan relatif diperiksa; tidak ada file agent, `.env` aktual, database, runtime, dependency terpasang atau nilai rahasia lokal dalam kandidat publikasi. 134 file instruksi/config/arsip kerja, termasuk launcher Codex dan konfigurasi Playwright CLI agent, dikeluarkan dari Git dengan salinan lokal dipertahankan. Riwayat Git tidak ditulis ulang; commit lama tetap merupakan sejarah, bukan isi source utama saat ini.
 
 ## Membaca hasil dan batasnya
 
