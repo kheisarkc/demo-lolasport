@@ -1,49 +1,50 @@
-# demo-lolasport
+# Lola Sport — demo reservasi lapangan
 
-Demo pribadi Lola Sport: Laravel 13 + Next.js 16 + PostgreSQL 17. Reservasi futsal/badminton, akun pelanggan/pegawai/pemilik, walk-in, jadwal pemeliharaan, pembayaran manual fiktif, verifikasi dan laporan penerimaan. Antarmuka Indonesia, desktop dan HP.
+Demo lokal futsal/badminton untuk belajar dan diskusi kelompok capstone. Pelanggan memesan, pegawai mengelola jadwal serta memverifikasi pembayaran, dan pemilik membaca penerimaan pembayaran. Antarmuka berbahasa Indonesia dan memprioritaskan HP.
 
-## Menjalankan
+**Ini eksperimen pribadi berbantuan AI, belum menjadi hasil final kelompok atau UAT pengelola.** Harga, DP, tenggat, dan kebijakan pembatalan memakai [asumsi simulasi](docs/DEMO-ASSUMPTIONS.md). Tidak ada rekening/QR aktif, payment gateway, atau deployment publik.
 
-Dependency dan konfigurasi lokal sudah disiapkan pada komputer ini. Dari folder demo:
+## Mulai sesuai tujuan
+
+- **Mau mencoba:** [Panduan kelompok — setup, akun, skenario, dan solusi kendala](docs/PANDUAN-KELOMPOK.md).
+- **Mau memahami kode:** [Arsitektur dan perjalanan satu reservasi](docs/ARSITEKTUR-DAN-ALUR.md).
+- **Mau mengubah:** [Panduan kontribusi, latihan kecil, Git, dan review](CONTRIBUTING.md).
+- **Mau melihat bukti:** [Status](docs/STATE.md), [verifikasi UI 002](specs/002-mobile-redesign/verification.md), dan [penyerahan 003](specs/003-team-handoff/verification.md). Laporan lama bukan bukti pemeriksaan baru.
+
+GitHub membagikan **source**, bukan aplikasi yang langsung berjalan di internet. Setiap anggota menjalankan salinan dan database sendiri; transaksi di komputer satu tidak otomatis muncul di komputer lain. Tidak perlu akun AI atau API key AI untuk memakai aplikasinya.
+
+## Menjalankan di Windows
+
+Siapkan Git, **PowerShell 7 (`pwsh`)**, Node.js **22.16+**, PHP **8.4**, Composer, Python **3.11+**, dan Docker Desktop yang sudah berjalan dengan Linux containers. Panduan awal ini ditujukan untuk Windows; setup komputer baru dan macOS/Linux belum diverifikasi secara langsung. Lihat [langkah lengkap dan pengecekan prasyarat](docs/PANDUAN-KELOMPOK.md#1-siapkan-komputer).
 
 ```powershell
-npm run dev
-```
-
-Buka **http://127.0.0.1:3001**. Laravel health: http://127.0.0.1:8001/api/v1/health. Docker Desktop harus berjalan. Perintah menyalakan database demo, migrasi tambahan, seed idempoten dan kedua server. Ctrl+C menghentikan server yang diluncurkannya. `npm run db:stop` menghentikan container demo tanpa menghapus volume.
-
-Untuk checkout baru di Windows dengan Node 22+, PHP 8.4, Composer, Python 3.11+ dan Docker terpasang:
-
-```powershell
+git clone https://github.com/kheisarkc/demo-lolasport.git
+cd demo-lolasport
 pwsh -File scripts/bootstrap.ps1
 npm run dev
 ```
 
-Bootstrap memasang dependency sesuai lockfile pada proyek ini. PHP 8.4 dipilih dari `C:\Tools\php84\php.exe` bila tersedia; PHP XAMPP 8.2 tidak memenuhi persyaratan. Tidak perlu mengubah PATH/global permissions. Jika port terpakai, launcher berhenti tanpa mematikan proses lain; lihat docs/SETUP.md.
+Bootstrap memasang dependency sesuai lockfile, membuat konfigurasi serta rahasia lokal, lalu menyiapkan database dan data contoh. Unduhan memerlukan internet. Gunakan folder baru, bukan menimpa proyek yang sudah ada. PHP XAMPP 8.2 tidak memenuhi lockfile; jika tersedia, bootstrap memilih `C:\Tools\php84\php.exe`.
 
-## Akun fiktif
+Buka **http://127.0.0.1:3001**. Untuk pemakaian berikutnya cukup `npm run dev` dari root. `Ctrl+C` menghentikan server yang diluncurkan; `npm run db:stop` menghentikan database tanpa menghapus volume.
 
-Kata sandi ketiga akun: **`DemoLola2026!`**.
+## Akun dan alur mencoba
 
-- Pelanggan: `pelanggan@lola.test`
-- Pegawai: `pegawai@lola.test`
-- Pemilik: `pemilik@lola.test`
+Kata sandi ketiga akun: **`DemoLola2026!`**. Gunakan hanya data dan bukti fiktif.
 
-Data registrasi tambahan harus fiktif. Akun contoh ini hanya untuk demo lokal.
+- Pelanggan: `pelanggan@lola.test` — pilih jadwal, konfirmasi, kirim bukti DP/pelunasan, lihat reservasi sendiri.
+- Pegawai: `pegawai@lola.test` — agenda, walk-in, blok pemeliharaan, verifikasi, tunai, dan master lapangan.
+- Pemilik: `pemilik@lola.test` — laporan pembayaran approved menurut tanggal persetujuan WIB.
 
-## Mencoba alur lengkap
+Coba **pelanggan → reservasi futsal Rp150.000 → bukti DP Rp75.000 → pegawai setujui → pelunasan Rp75.000 → pegawai setujui → pemilik cocokkan kenaikan Rp150.000**. Bukti fiktif PNG dapat diunduh dari formulir pembayaran; mengunggah bukti belum menambah penerimaan. [Langkah lengkap dan skenario tambahan](docs/PANDUAN-KELOMPOK.md#3-coba-alur-utama).
 
-1. Masuk sebagai pelanggan, pilih tanggal mendatang dan jam tersedia, lalu buat reservasi. Lihat tenggat hold dan minimum DP pada detail.
-2. Pilih transfer/QRIS demo, masukkan DP atau total, unggah bukti fiktif PNG/JPG/PDF maksimal 2 MB. Tidak ada rekening/QR aktif atau payment gateway. Bukti belum dihitung sebagai penerimaan.
-3. Keluar dan masuk sebagai pegawai. Buka **Verifikasi**, pilih detail, unduh bukti, lalu setujui atau tolak dengan alasan. DP diterima mengonfirmasi reservasi.
-4. Pelanggan mengajukan pelunasan tepat sisa tagihan; pegawai menyetujuinya. Pegawai juga dapat mencatat tunai, walk-in dan blok pemeliharaan melalui **Jadwal**.
-5. Pemilik membuka **Penerimaan pembayaran**, memilih tanggal persetujuan WIB, lalu mencocokkan total dengan rincian. DP dan pelunasan masuk masing-masing sekali. Pembatalan tanpa refund tetap masuk penerimaan.
+## Struktur dan pemeriksaan
 
-Pegawai mengubah master pada **Kelola lapangan**. Harga lama tersimpan pada transaksi. Perubahan jam/nonaktif yang mematahkan booking aktif akan ditolak. Pembatalan hanya sebelum mulai, tanpa refund/pindah jadwal pada simulasi ini.
-
-## Isolasi dan verifikasi
-
-Compose project `lola-sport-demo`, volume `lola-sport-demo_lola_demo_postgres`, PostgreSQL loopback `127.0.0.1:55433`, database `lola_demo` dan `lola_demo_test`. Sesi `lola_demo_session`, origin web `127.0.0.1:3001`, rahasia lokal baru. Seluruh `.env`, runtime, bukti upload dan hasil tes diabaikan Git.
+- `apps/web`: Next.js 16, React, TypeScript; halaman dan proxy.
+- `apps/api`: Laravel 13, PHP 8.4, Sanctum; aturan, otorisasi, transaksi, dan data.
+- `compose.yaml`: PostgreSQL 17 lokal.
+- `specs/000-foundation`, `001-demo`, `002-mobile-redesign`, `003-team-handoff`: kebutuhan, rencana, tugas, dan bukti menurut tahap.
+- `docs`: panduan, keputusan, asumsi, dan status. [Peta file lebih lengkap](docs/ARSITEKTUR-DAN-ALUR.md).
 
 ```powershell
 npm run doctor
@@ -51,23 +52,10 @@ npm run check
 npm run test:e2e
 ```
 
-`check` mencakup Pint, Pest/PostgreSQL termasuk dua proses konkurensi, PHPStan, ESLint, TypeScript dan build. E2E memakai Chromium desktop/Pixel 7 serta transaksi fiktif pada database tes terisolasi. Tes backend hanya boleh membersihkan `lola_demo_test`; guard memeriksa nama, host, port dan koneksi sebelum pembersihan. Jangan menjalankan reset database operasional.
+Jalankan `check` dan E2E **bergantian**. Keduanya menggunakan database tes yang boleh dibersihkan runner, **`lola_demo_test`**, dengan guard sebelum cleanup. E2E memakai layanan 3002/8002; aplikasi demo memakai 3001/8001 dan `lola_demo`. Jangan menjalankan perintah reset database operasional.
 
-Spec/plan/tasks: `specs/001-demo/`. Asumsi: `docs/DEMO-ASSUMPTIONS.md`. Hasil aktual dan keterbatasan: `specs/001-demo/verification.md` serta `docs/STATE.md`. Riwayat awal README GitHub dipertahankan dalam commit d8b230c. Fondasi diambil dari snapshot Git; repo induk hanya diberi pengecualian lokal untuk folder demo.
+Rahasia `.env`, dependency, database, unggahan, dan screenshot lokal tidak masuk Git. Clone baru mendapat akun/lapangan dari seeder, bukan riwayat transaksi komputer pembuat. Screenshot historis hanya ada pada komputer yang membuatnya. [Detail isolasi](docs/SETUP.md).
 
-Ini eksperimen lokal dengan aturan simulasi sementara. Belum UAT pengelola dan belum siap produksi. Tidak ada push atau deployment.
+## Batas penggunaan
 
-## Redesign mobile
-
-UI sekarang memakai halaman yang bisa dibuka langsung, di-refresh, dan dinavigasi dengan Back:
-
-- Pelanggan: `/`, `/checkout`, `/reservasi`, `/reservasi/[id]`, `/masuk`, `/daftar`.
-- Pegawai: `/pegawai` (hari ini), `/pegawai/jadwal`, `/pegawai/verifikasi`, `/pegawai/lapangan`, dan `/pegawai/reservasi`.
-- Pemilik: `/pemilik/laporan` dengan periode cepat atau rentang khusus.
-- Semua peran: `/akun` untuk melihat akun dan keluar.
-
-Pada HP, pilihan jadwal tampil dalam ringkasan bawah; login mempertahankan pilihan menuju checkout dan tidak otomatis membuat reservasi. Pegawai memakai agenda per lapangan, antrean bukti dengan preview/perbesar, serta editor master yang hanya dibuka saat dibutuhkan. Laporan memakai kartu transaksi pada HP, tabel pada desktop, dan komponen DP/pelunasan/bayar penuh yang menjumlah total approved.
-
-Pengujian browser redesign memakai **layanan khusus 3002/8002 dan `lola_demo_test`**. Runner memeriksa database sebelum membersihkan database tes, membangun Next ke `.next-e2e`, lalu menjalankan build tersebut. Cookie, storage dan bukti tes terpisah; `lola_demo` tidak di-reset atau diisi E2E redesign. Jangan menjalankan tes backend dan browser bersamaan karena keduanya memakai database tes yang sama.
-
-Screenshot lokal: `.runtime/reports/redesign/before/` dan `.runtime/reports/redesign/after/`. Spec/plan/tasks terbaru: `specs/002-mobile-redesign/`. Hasil aktual redesign dicatat pada `specs/002-mobile-redesign/verification.md`; bukti fitur001 tetap menjadi riwayat pengujian versi sebelumnya.
+Belum UAT pengelola, belum siap produksi, dan tidak ada pembayaran nyata. Pengujian lokal tidak membuktikan instalasi semua komputer, kegunaan oleh manusia, atau kesiapan beban produksi. Source fondasi berasal dari snapshot `c628fdc`; riwayat awal repo `d8b230c` dipertahankan. Publikasi source ke repo ini diizinkan pengguna pada tahap 003; publikasi source bukan deployment aplikasi.

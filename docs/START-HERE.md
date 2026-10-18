@@ -1,5 +1,7 @@
 # Mulai dari demo
 
+**Anggota kelompok baru:** mulai dari [README](../README.md) → [panduan mencoba](PANDUAN-KELOMPOK.md) → [peta kode dan alur](ARSITEKTUR-DAN-ALUR.md) → [cara kontribusi](../CONTRIBUTING.md). Jalur ini tidak memerlukan akun AI.
+
 Ruang lingkup demo lengkap: akun, lapangan/jadwal, reservasi, pembayaran manual dan penerimaan. Status aktual pada STATE.md; keputusan simulasi pada DEMO-ASSUMPTIONS.md. Sumber fondasi lama bukan bukti verifikasi demo.
 
 1. Baca AGENTS.md, PROJECT.md, DECISIONS.md dan STATE.md.
@@ -11,3 +13,5 @@ Perintah: `npm run doctor`, `npm run check`, `npm run test:e2e`, `npm run api --
 Database demo `lola_demo`, tes `lola_demo_test`, port 55433. API 8001, web 3001. Rahasia/runtime/upload/hasil tes tidak masuk Git. Tidak ada PDF atau ekstraksi proposal yang disimpan dalam source.
 
 Untuk UI terbaru lihat specs/002-mobile-redesign. Jalur awal pegawai /pegawai, pemilik /pemilik/laporan, pelanggan /. E2E sekarang memakai layanan/database tes terisolasi; jangan jalankan bersamaan dengan backend check.
+
+Panduan dan publikasi source untuk kelompok dicatat pada specs/003-team-handoff. Izin push pada tahap003 berasal dari permintaan pengguna setelah tahap eksperimen; tidak mencakup deployment.

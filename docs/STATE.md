@@ -1,5 +1,15 @@
 # Status demo Lola Sport
 
+## Penyerahan kelompok 003 — siap dipublikasikan
+
+18 Oktober 2026: pengguna meminta push ke repo demo-lolasport beserta panduan terstruktur. Remote sudah di-fetch; main berada di d8b230c dan merupakan leluhur source lokal 8b41986. Tidak ada pekerjaan remote yang perlu ditimpa.
+
+README diperbarui untuk clone baru; panduan kelompok, arsitektur/alur, dan CONTRIBUTING ditambahkan. SETUP diperbaiki agar nama environment/variabel E2E sesuai kode. Tidak ada perubahan aplikasi, dependency, atau aturan bisnis. Spec/plan/tasks berada pada specs/003-team-handoff.
+
+Auto-review awal menolak pemeriksaan database karena instruksi read-only sebelumnya; setelah pengguna mengizinkan kedua tes pada database tes, izin diperoleh. Docker Desktop yang belum berjalan dinyalakan tanpa menghapus volume. Putaran baru `npm run check` selesai exit0: 22 tes/147 assertion, Pint/PHPStan/lint/typecheck/build lulus. E2E baru selesai exit0: 19 passed,1 skipped,5,5 menit; skip hanya pengulangan matriks viewport yang sudah berjalan lengkap. Keduanya memakai lola_demo_test secara berurutan; tidak mereset lola_demo. Pemeriksaan tautan/diff dan pemindaian rahasia/riwayat tidak menemukan masalah yang dicari; dry-run push berhasil. Detail pada specs/003-team-handoff/verification.md. Commit dan push nyata akan diverifikasi berikutnya; setup komputer anggota tetap belum diuji.
+
+## Arsip hasil redesign 002
+
 18 Oktober 2026: **redesign mobile 002 selesai diimplementasikan dan diverifikasi lokal**, langsung pada repo demo yang sama. Ini eksperimen pribadi, belum UAT pengelola dan bukan sistem produksi.
 
 ## Hasil yang tersedia
