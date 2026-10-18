@@ -153,10 +153,10 @@ function doctor() {
   run(php, ['-r', 'if (!extension_loaded("pdo_pgsql")) { fwrite(STDERR,"pdo_pgsql is missing\\n"); exit(1); } echo "pdo_pgsql ready\\n";']);
   console.log(`Node ${process.version}`);
   compose(['ps']);
-  for (const file of ['AGENTS.md', '.codex/config.toml', '.agents/skills/speckit-implement/SKILL.md', 'apps/api/vendor/autoload.php', 'node_modules/next/package.json']) {
+  for (const file of ['compose.yaml', 'apps/api/vendor/autoload.php', 'node_modules/next/package.json']) {
     if (!existsSync(join(root, file))) throw new Error(`Missing: ${file}`);
   }
-  console.log('Project tools and workflow files are present.');
+  console.log('Application runtime and dependencies are present.');
 }
 const [command = 'doctor', ...args] = process.argv.slice(2);
 try {
@@ -184,15 +184,6 @@ try {
     npm(['run', 'typecheck', '--workspace', 'apps/web']);
     run(process.execPath, [join(root, 'node_modules/typescript/bin/tsc'), '--project', join(root, 'tsconfig.e2e.json')]);
     npm(['run', 'build', '--workspace', 'apps/web']);
-  }
-  else if (command === 'specify') run(windows ? join(runtime, 'specify/Scripts/specify.exe') : join(runtime, 'specify/bin/specify'), args);
-  else if (command === 'agent:run') {
-    const task = args.join(' ').trim();
-    if (!task) throw new Error('Usage: npm run agent:run -- "Describe one bounded task"');
-    mkdirSync(join(runtime, 'reports'), { recursive: true });
-    const output = join(runtime, 'reports', `task-${new Date().toISOString().replace(/[:.]/g, '-')}.md`);
-    const prompt = `Read AGENTS.md and docs/START-HERE.md. Execute this authorized local development task end-to-end following docs/WORKFLOW.md. Persist plans and progress, run relevant checks, and report actual evidence. Do not deploy, access production, delete data, or invent unresolved business decisions. Task: ${task}`;
-    run(local.codex || 'codex', ['exec', '--cd', root, '--sandbox', 'workspace-write', '--approve-for-me', '--output-last-message', output, prompt]);
   }
   else throw new Error(`Unknown command: ${command}`);
 } catch (error) { console.error(error.message); process.exitCode = 1; }

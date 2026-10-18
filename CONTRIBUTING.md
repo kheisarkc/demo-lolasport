@@ -1,16 +1,16 @@
 # Mengutak-atik Lola Sport bersama kelompok
 
-[Mulai mencoba](docs/PANDUAN-KELOMPOK.md) · [Peta kode](docs/ARSITEKTUR-DAN-ALUR.md) · [Workflow proyek](docs/WORKFLOW.md)
+[Mulai mencoba](docs/PANDUAN-KELOMPOK.md) · [Peta kode](docs/ARSITEKTUR-DAN-ALUR.md)
 
 Ini usulan cara kerja, bukan pembagian kontribusi yang sudah terjadi. Demo berbantuan AI dapat dipakai seluruhnya, sebagian, atau hanya sebagai bahan perbandingan setelah kelompok menyepakatinya. Jangan menyebutnya hasil final kelompok/UAT sebelum ada kegiatan dan buktinya.
 
 ## 1. Sebelum mengubah
 
 1. Jalankan dan coba alur satu reservasi sampai laporan.
-2. Baca [AGENTS.md](AGENTS.md), [PROJECT](docs/PROJECT.md), [DECISIONS](docs/DECISIONS.md), [STATE](docs/STATE.md), dan [asumsi demo](docs/DEMO-ASSUMPTIONS.md).
+2. Baca [kebutuhan](docs/PROJECT.md), [keputusan teknis](docs/DECISIONS.md), [hasil pengujian](docs/PENGUJIAN.md), dan [asumsi demo](docs/DEMO-ASSUMPTIONS.md).
 3. Tentukan perubahan kecil dan hasil yang diharapkan. Jika menyentuh aturan usaha, sepakati dahulu sumber keputusannya.
-4. Baca file terkait. Backend mempunyai [instruksi sendiri](apps/api/AGENTS.md); frontend mengikuti [instruksi versi Next](apps/web/AGENTS.md). Dokumentasi Next terpasang tersedia setelah pemasangan dependency.
-5. Catat kebutuhan, rencana dan tugas di `specs/<nomor>-<fitur>/` mengikuti Spec Kit. Dokumentasi boleh ringkas sesuai ukuran perubahan; jangan membuat centang kelulusan tanpa pemeriksaan.
+4. Baca file terkait dan dokumentasi yang sesuai versi Laravel/Next terpasang. Dokumentasi Next lokal tersedia setelah pemasangan dependency; peta file ada pada panduan arsitektur.
+5. Tulis tujuan, rencana singkat dan kriteria hasil pada issue/PR. Perbarui dokumen kebutuhan bila perilaku berubah. Tidak ada workflow atau alat AI yang wajib dipasang.
 
 Jangan membagikan `.env`, kata sandi lokal, database, upload, dependency atau PDF/transkrip proposal yang mengandung informasi pribadi. Akun demo yang terdokumentasi memang fiktif; rahasia runtime adalah hal berbeda.
 
@@ -68,7 +68,7 @@ npm run test:e2e
 
 Jika gagal, baca error asli dan tindakan pemicunya, lihat perubahan terakhir, bentuk satu dugaan, lalu uji perbaikan terarah. Jangan mengubah ekspektasi tes hanya agar cocok dengan bug. Tes harus memeriksa kebutuhan dan perhitungan yang disepakati.
 
-Pada PR, bedakan “pernah lulus menurut laporan 002” dengan “dijalankan pada perubahan ini”. Hasil tes, pemeriksaan visual, tes kegunaan manusia, dan UAT bukan hal yang sama.
+Pada PR, bedakan “pernah lulus menurut laporan sebelumnya” dengan “dijalankan pada perubahan ini”. Hasil tes, pemeriksaan visual, tes kegunaan manusia, dan UAT bukan hal yang sama.
 
 ## 5. Review sebelum digabung
 
@@ -78,7 +78,7 @@ Pada PR, bedakan “pernah lulus menurut laporan 002” dengan “dijalankan pad
 - Tidak ada rahasia, data nyata, dependency/runtime atau laporan sensitif masuk Git.
 - Label, error, loading/kosong, target sentuh dan lebar HP diperiksa jika UI berubah.
 - Tes relevan berjalan pada tujuan aman; hasil aktual dan keterbatasan ditulis.
-- Kebutuhan/keputusan/spec/STATE diperbarui bila perilaku berubah.
+- Dokumen kebutuhan/keputusan dan hasil pemeriksaan diperbarui bila perilaku berubah.
 - Tidak ada klaim wawancara, kontribusi anggota, persetujuan, atau UAT yang belum terjadi.
 
 ## 6. Usulan pembagian tiga anggota
@@ -95,8 +95,8 @@ Semua ikut memahami kebutuhan, meninjau kode anggota lain, menguji, serta mendok
 
 Contoh instruksi yang terarah:
 
-> Baca AGENTS.md dan komponen Reservasi Saya. Jelaskan perilaku kosong sekarang. Ubah hanya pesan dan tautan pemulihannya sesuai kebutuhan berikut. Pertahankan aturan backend, tampilkan diff, jalankan pemeriksaan yang relevan pada database tes, lalu catat hasil yang benar-benar dijalankan.
+> Baca kebutuhan proyek dan komponen Reservasi Saya. Jelaskan perilaku kosong sekarang. Ubah hanya pesan dan tautan pemulihannya sesuai kebutuhan berikut. Pertahankan aturan backend, tampilkan diff, jalankan pemeriksaan yang relevan pada database tes, lalu catat hasil yang benar-benar dijalankan.
 
-Lu tetap perlu membaca diff, mengikuti satu alur data, memahami pesan error, dan membandingkan tes dengan kebutuhan. AI/skill/MCP membantu bekerja; mereka bukan sumber persetujuan kebijakan pengelola. Catat penggunaan AI dan kontribusi manusia sesuai kegiatan sebenarnya.
+Lu tetap perlu membaca diff, mengikuti satu alur data, memahami pesan error, dan membandingkan tes dengan kebutuhan. AI boleh membantu bekerja, tetapi bukan sumber persetujuan kebijakan pengelola. Konfigurasi AI, instruksi agent, prompt pribadi dan skill disimpan lokal, bukan disertakan ke repo aplikasi. Catat penggunaan AI dan kontribusi manusia sesuai kegiatan sebenarnya.
 
 Keputusan kelompok/pengelola berikutnya: apakah demo dijadikan dasar, aturan tarif/DP/tenggat/refund, arti omzet, hak akses, data/bukti yang disimpan, peserta/instrumen UAT, pemeliharaan dan lingkungan penerapan. Deployment dan pembayaran nyata memerlukan kesepakatan terpisah.

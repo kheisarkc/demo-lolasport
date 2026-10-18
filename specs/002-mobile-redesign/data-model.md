@@ -1,2 +1,0 @@
-# Data model
-No schema change. Existing Court/Booking/Payment/Audit/User unchanged. Ephemeral view selection: date,court,hour,duration in URL. Catalog adds slot.status and server_now. Detail adds server_now. Reports add per-payment kind (dp,settlement,full), totals_by_kind. Derive kind in approval order (reviewed_at,id), across all approved payment history of booking, then aggregate only selected date range.

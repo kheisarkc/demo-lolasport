@@ -8,16 +8,15 @@ Proposal membahas pencatatan reservasi, pembayaran, dan pemantauan usaha. Penggu
 
 Urutan belajar: masalah → kebutuhan → batas → spesifikasi → alur dan rancangan data/UI → rencana/tugas → kode → pengujian → evaluasi manusia → serah terima. Ini urutan penjelasan, bukan klaim kronologi sempurna. Proposal memakai Waterfall; persetujuan tahap dan UAT akademik tidak dibuktikan oleh checklist AI.
 
-Artefaknya:
+Dokumen yang dipakai kelompok:
 
-- [PROJECT](PROJECT.md): tujuan dan batas; menjalankan sebagian fungsi PRD (dokumen kebutuhan produk).
-- [DECISIONS](DECISIONS.md): keputusan; [DEMO-ASSUMPTIONS](DEMO-ASSUMPTIONS.md): aturan simulasi, bukan hasil wawancara baru.
-- [Spec 001](../specs/001-demo/spec.md): kebutuhan, skenario dan acceptance criteria (kondisi hasil yang harus terpenuhi).
-- [Plan 001](../specs/001-demo/plan.md) dan [tasks](../specs/001-demo/tasks.md): cara teknis dan pekerjaan.
-- [Model data](../specs/001-demo/data-model.md): entitas/hubungan secara tekstual, bukan diagram ERD formal terpisah.
-- [Kontrak API](../specs/001-demo/contracts/api.md): alamat, data dan hasil komunikasi antarlapisan.
-- [Spec 002](../specs/002-mobile-redesign/spec.md): kebutuhan UX mobile; [plan](../specs/002-mobile-redesign/plan.md) memuat susunan layar dan token desain. Tidak ada wireframe terpisah yang diklaim selesai.
-- [STATE](STATE.md) dan laporan verification tiap tahap: pemeriksaan yang dilaporkan, kegagalan/perbaikan dan batasnya. Centang tugas tidak menggantikan bukti.
+- [PROJECT](PROJECT.md): kebutuhan, batas dan kriteria penerimaan; menjalankan sebagian fungsi PRD (dokumen kebutuhan produk).
+- [DECISIONS](DECISIONS.md): keputusan arsitektur; [DEMO-ASSUMPTIONS](DEMO-ASSUMPTIONS.md): aturan simulasi, bukan hasil wawancara baru.
+- Dokumen ini: alur, peta kode, model data dan kontrak API ringkas. Belum mengklaim diagram ERD formal atau wireframe terpisah.
+- [PENGUJIAN](PENGUJIAN.md): cara memeriksa, hasil aktual dan batasnya.
+- [CONTRIBUTING](../CONTRIBUTING.md): proses perubahan, review dan integrasi kelompok.
+
+Catat kebutuhan serta rencana perubahan pada issue/PR. Alat/workflow AI tidak diwajibkan dan tidak menjadi dependency aplikasi.
 
 ## 2. Siapa mengerjakan apa?
 
@@ -35,7 +34,7 @@ Autentikasi berarti mengenali akun. Session/cookie mengingat keadaan login. Otor
 
 Docker menjalankan PostgreSQL pada setup ini. Dependency dipasang oleh npm/Composer sesuai lockfile. `.env` menyimpan konfigurasi/rahasia per komputer; source dan database adalah hal berbeda. Git merekam perubahan lokal; GitHub membagikannya setelah push.
 
-AGENTS.md, skill, MCP Boost/Context7 dan Spec Kit membantu agen/pengembang. Itu bukan komponen yang diperlukan pelanggan saat memesan; akun AI tidak diperlukan untuk menjalankan alur aplikasi. Adanya konfigurasi MCP tidak membuktikan koneksinya sedang aktif.
+Konfigurasi dan instruksi AI merupakan perlengkapan pribadi pengembang. Source yang dibagikan tidak membutuhkannya untuk dijalankan, dites, atau diubah.
 
 ## 3. Peta file yang berguna
 
@@ -88,3 +87,24 @@ Kegagalan adalah bagian alur: 401 sesi tidak berlaku; 403 tidak berwenang; 409 k
 Tes fungsi menjawab apakah perilaku sesuai ekspektasi. Screenshot membantu memeriksa tampilan. Tes kegunaan membutuhkan manusia mencoba tugas. UAT membutuhkan penilaian pengguna berwenang terhadap kebutuhan yang disepakati. Dua hal terakhir belum digantikan pemeriksaan agen.
 
 AI dapat menulis kode dan tes dengan asumsi salah yang sama. Selalu bandingkan dengan kebutuhan, hitungan acuan, dan masukan pengelola; jangan hanya menghitung jumlah tes lulus.
+
+## 7. Model data dan API ringkas
+
+Hubungan data: satu akun pelanggan dapat memiliki banyak booking; satu lapangan memiliki banyak booking; satu booking memiliki banyak pembayaran dan audit event. Walk-in dapat memakai nama pelanggan fiktif tanpa akun. Blok pemeliharaan memakai booking source `block` tanpa tagihan.
+
+- `users`: identitas, password ter-hash, peran.
+- `courts`: olahraga, harga integer, jam buka/tutup, status aktif.
+- `bookings`: relasi lapangan/pelanggan, sumber, mulai/selesai, snapshot harga/DP, status dan tenggat.
+- `payments`: booking, nominal, metode, status, path bukti privat, pengaju, pemeriksa, waktu/alasan keputusan.
+- `audit_events`: tindakan, pelaku, waktu dan metadata perubahan.
+
+Kontrak endpoint `/api/v1` berikut memakai JSON, kecuali upload pembayaran berupa multipart. Mutasi memakai session dan CSRF; backend tetap memeriksa role/kepemilikan. Route aktual ada pada [api.php](../apps/api/routes/api.php).
+
+- Publik: `GET /health`, `GET /courts?date=YYYY-MM-DD`, `POST /register`, `POST /login`.
+- Login: `GET /me`, `POST /logout`.
+- Pelanggan/pegawai sesuai akses: `GET/POST /bookings`, `GET /bookings/{id}`, `POST /bookings/{id}/cancel`. Booking menerima `court_id`, `date`, `hour`, `duration`; walk-in juga `customer_name`.
+- Pembayaran: `POST /bookings/{id}/payments` dengan `amount`, `method`, `proof`; `GET /payments/{id}/proof` privat.
+- Pegawai: `POST /payments/{id}/review` dengan `decision` dan alasan penolakan; `GET/POST /staff/courts`, `PATCH /staff/courts/{id}`, `POST /staff/blocks` dengan jadwal/alasan.
+- Pemilik: `GET /reports?from=YYYY-MM-DD&to=YYYY-MM-DD`, mengembalikan total, kategori DP/pelunasan/penuh, agregat harian/bulanan dan rincian approved.
+
+Jadwal publik menambah `slot.status` dan `server_now`, tanpa identitas pelanggan. Detail booking juga menyediakan waktu server. Laporan memakai seluruh riwayat approved untuk menentukan kategori, baru menjumlah periode terpilih. Cocokkan perubahan kontrak dengan frontend dan tes sebelum menggabungkan PR.

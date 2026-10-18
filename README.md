@@ -9,13 +9,13 @@ Demo lokal futsal/badminton untuk belajar dan diskusi kelompok capstone. Pelangg
 - **Mau mencoba:** [Panduan kelompok — setup, akun, skenario, dan solusi kendala](docs/PANDUAN-KELOMPOK.md).
 - **Mau memahami kode:** [Arsitektur dan perjalanan satu reservasi](docs/ARSITEKTUR-DAN-ALUR.md).
 - **Mau mengubah:** [Panduan kontribusi, latihan kecil, Git, dan review](CONTRIBUTING.md).
-- **Mau melihat bukti:** [Status](docs/STATE.md), [verifikasi UI 002](specs/002-mobile-redesign/verification.md), dan [penyerahan 003](specs/003-team-handoff/verification.md). Laporan lama bukan bukti pemeriksaan baru.
+- **Mau memeriksa hasil:** [Panduan dan hasil pengujian](docs/PENGUJIAN.md). Laporan lama bukan bukti pemeriksaan baru.
 
 GitHub membagikan **source**, bukan aplikasi yang langsung berjalan di internet. Setiap anggota menjalankan salinan dan database sendiri; transaksi di komputer satu tidak otomatis muncul di komputer lain. Tidak perlu akun AI atau API key AI untuk memakai aplikasinya.
 
 ## Menjalankan di Windows
 
-Siapkan Git, **PowerShell 7 (`pwsh`)**, Node.js **22.16+**, PHP **8.4**, Composer, Python **3.11+**, dan Docker Desktop yang sudah berjalan dengan Linux containers. Panduan awal ini ditujukan untuk Windows; setup komputer baru dan macOS/Linux belum diverifikasi secara langsung. Lihat [langkah lengkap dan pengecekan prasyarat](docs/PANDUAN-KELOMPOK.md#1-siapkan-komputer).
+Siapkan Git, **PowerShell 7 (`pwsh`)**, Node.js **22.16+**, PHP **8.4**, Composer, dan Docker Desktop yang sudah berjalan dengan Linux containers. Panduan awal ini ditujukan untuk Windows; setup komputer baru dan macOS/Linux belum diverifikasi secara langsung. Lihat [langkah lengkap dan pengecekan prasyarat](docs/PANDUAN-KELOMPOK.md#1-siapkan-komputer).
 
 ```powershell
 git clone https://github.com/kheisarkc/demo-lolasport.git
@@ -27,6 +27,8 @@ npm run dev
 Bootstrap memasang dependency sesuai lockfile, membuat konfigurasi serta rahasia lokal, lalu menyiapkan database dan data contoh. Unduhan memerlukan internet. Gunakan folder baru, bukan menimpa proyek yang sudah ada. PHP XAMPP 8.2 tidak memenuhi lockfile; jika tersedia, bootstrap memilih `C:\Tools\php84\php.exe`.
 
 Buka **http://127.0.0.1:3001**. Untuk pemakaian berikutnya cukup `npm run dev` dari root. `Ctrl+C` menghentikan server yang diluncurkan; `npm run db:stop` menghentikan database tanpa menghapus volume.
+
+Jika sudah pernah clone versi lama, simpan perubahan sendiri dahulu, ambil pembaruan dengan `git pull --ff-only`, lalu jalankan ulang bootstrap saat lockfile/dependency berubah. Konfigurasi `.env` dan data demo yang sudah ada tidak di-reset. Jangan menyalin `node_modules` atau `vendor` antar komputer.
 
 ## Akun dan alur mencoba
 
@@ -43,7 +45,10 @@ Coba **pelanggan → reservasi futsal Rp150.000 → bukti DP Rp75.000 → pegawa
 - `apps/web`: Next.js 16, React, TypeScript; halaman dan proxy.
 - `apps/api`: Laravel 13, PHP 8.4, Sanctum; aturan, otorisasi, transaksi, dan data.
 - `compose.yaml`: PostgreSQL 17 lokal.
-- `specs/000-foundation`, `001-demo`, `002-mobile-redesign`, `003-team-handoff`: kebutuhan, rencana, tugas, dan bukti menurut tahap.
+- `apps/api/database`: migration dan seeder untuk membuat struktur serta data contoh; bukan salinan database pribadi.
+- `tests/e2e` dan `.github/workflows`: tes browser dan pemeriksaan CI otomatis.
+- `scripts`: bootstrap dan launcher aplikasi.
+- `docs/PROJECT.md`: kebutuhan dan batas aplikasi.
 - `docs`: panduan, keputusan, asumsi, dan status. [Peta file lebih lengkap](docs/ARSITEKTUR-DAN-ALUR.md).
 
 ```powershell
@@ -58,4 +63,10 @@ Rahasia `.env`, dependency, database, unggahan, dan screenshot lokal tidak masuk
 
 ## Batas penggunaan
 
-Belum UAT pengelola, belum siap produksi, dan tidak ada pembayaran nyata. Pengujian lokal tidak membuktikan instalasi semua komputer, kegunaan oleh manusia, atau kesiapan beban produksi. Source fondasi berasal dari snapshot `c628fdc`; riwayat awal repo `d8b230c` dipertahankan. Publikasi source ke repo ini diizinkan pengguna pada tahap 003; publikasi source bukan deployment aplikasi.
+Belum UAT pengelola, belum siap produksi, dan tidak ada pembayaran nyata. Pengujian lokal tidak membuktikan instalasi semua komputer, kegunaan oleh manusia, atau kesiapan beban produksi. Publikasi source bukan deployment aplikasi.
+
+## Apa yang masuk Git?
+
+Repo menyimpan source aplikasi, migration/seeder, tes, CI, manifest/lockfile, konfigurasi proyek dan panduan kelompok. File `.env.example` adalah **template tanpa rahasia aktif**, bukan `.env` komputer pembuat. Bootstrap membuat `.env` dan APP_KEY/password lokal masing-masing anggota.
+
+`.env` aktual, database/volume, upload, log, build, dependency terpasang, serta konfigurasi/skill/instruksi agent AI tidak ikut source terbaru. Tidak perlu Python, Codex, Spec Kit, MCP, atau akun AI untuk setup dan mengembangkan aplikasi ini.

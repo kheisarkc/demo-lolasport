@@ -9,7 +9,7 @@ Untuk clone baru dan pemula, mulai dari [panduan kelompok](PANDUAN-KELOMPOK.md).
 - Next.js `127.0.0.1:3001`; Laravel `127.0.0.1:8001`; origin/Sanctum mengikuti web dan cookie `lola_demo_session`.
 - `npm run dev` menyalakan container, menjalankan migrasi tambahan dan seed idempoten, kemudian server. `npm run setup` menyiapkan database tanpa reset transaksi. `npm run db:stop` menghentikan container tanpa menghapus volume.
 
-`scripts/bootstrap.ps1` memerlukan PowerShell 7, Node 22.16+, PHP 8.4, Composer Windows, Python 3.11+ dan Docker Desktop yang sudah siap. Ia memilih PHP di `C:\Tools\php84\php.exe` bila ada, lalu membuat php.ini proyek dengan extension PostgreSQL, memasang Composer/npm sesuai lockfile, Spec Kit dan Chromium lokal. Tidak menghubungkan dependency ke proyek induk. Bootstrap mesin baru dan OS lain belum diverifikasi langsung.
+`scripts/bootstrap.ps1` memerlukan PowerShell 7, Node 22.16+, PHP 8.4, Composer Windows dan Docker Desktop yang sudah siap. Ia memilih PHP di `C:\Tools\php84\php.exe` bila ada, lalu membuat php.ini proyek dengan extension PostgreSQL, memasang dependency Composer/npm sesuai lockfile dan Chromium untuk test runner. Tidak menghubungkan dependency ke proyek induk. Bootstrap mesin baru dan OS lain belum diverifikasi langsung.
 
 Rahasia dibuat lokal saat konfigurasi belum ada. File `.env`, `apps/api/.env`, `apps/api/.env.testing`, `apps/web/.env.local`, serta `.runtime` diabaikan Git. `.runtime/tools.json` menyimpan lokasi program komputer ini; jangan menyalinnya ke komputer anggota. Jangan menyalin password/APP_KEY teman. Source tidak mencakup database atau riwayat upload.
 
@@ -36,6 +36,8 @@ Tes browser versi 001 sebelumnya menambah data fiktif pada `lola_demo` tanpa cle
 
 Default operasional masih eksplisit di beberapa file. Mengganti `.env` root saja tidak cukup: sesuaikan `compose.yaml`, API `.env`/`.env.testing`, `scripts/project.mjs`, guard `AppServiceProvider`/`TestCase`/worker, default Next, `.env.local`, origin Sanctum, health/CI dan dokumentasi. Jika nama database berubah, periksa SQL inisialisasi juga. Jangan mengganti nama/guard tes sembarangan. Untuk onboarding, pertahankan konfigurasi default bila tidak ada konflik.
 
-## Tools pengembangan
+## Batas file yang dibagikan
 
-MCP lokal memakai `scripts/boost-mcp.mjs` dan dependency Context7 proyek. Konfigurasi bukan bukti koneksi aktif; tidak perlu mengubah permission/trust global agar aplikasi berjalan. AI dan MCP opsional untuk memakai demo; bootstrap menyediakan tool pengembangan yang sudah menjadi bagian workflow repo. Detail: [TOOLS](TOOLS.md).
+`.env.example` hanya template konfigurasi tanpa APP_KEY/password aktif. File `.env` aktual tetap lokal, dibuat bootstrap dan diabaikan Git. Paket yang terpasang (`vendor`/`node_modules`), data/volume PostgreSQL, upload, build dan log juga tidak ikut commit.
+
+Bootstrap tidak memasang Python, Spec Kit, Codex, MCP atau paket khusus agent. Instruksi/config/skill AI dan catatan proses pribadi diabaikan Git. `doctor` hanya memeriksa runtime aplikasi, dependency dan container; editor atau akun AI tidak dibutuhkan.

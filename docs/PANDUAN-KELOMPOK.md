@@ -15,18 +15,16 @@ node --version
 npm --version
 php -v
 composer --version
-python --version
 docker version
 ```
 
 - Node minimal 22.16; source terakhir diverifikasi memakai Node 22.16.
 - PHP **8.4** dengan extension `pdo_pgsql`/`pgsql` dan kebutuhan Composer. PHP 8.2 dari XAMPP tidak cukup. Bootstrap memilih `C:\Tools\php84\php.exe` jika ada, selain itu `php` pada PATH. Jika versi salah, siapkan PHP 8.4 dahulu; tidak perlu mengganti PHP XAMPP.
 - Composer standar Windows: bootstrap mencari `composer.phar` di folder yang sama dengan launcher Composer.
-- Python 3.11+ dipakai bootstrap untuk lingkungan Spec Kit lokal. Spec Kit membantu pengembangan, bukan layanan yang harus dibuka pelanggan.
 - Docker Desktop harus sudah berjalan dengan Linux containers. `docker version` harus menampilkan bagian Client dan Server. Adanya Client saja belum cukup.
 - Gunakan `pwsh`, bukan Windows PowerShell 5.1. Bootstrap memakai fitur PowerShell 7.
 
-Jika ada program yang belum ditemukan, selesaikan instalasi dari sumber resminya dahulu, lalu buka terminal baru. Bootstrap memasang dependency **proyek**, bukan otomatis memasang seluruh program komputer. Internet diperlukan untuk clone, paket, image PostgreSQL, dan browser pengujian. Jangan menonaktifkan proteksi/global execution policy untuk melewati pesan error; catat error spesifiknya.
+Jika ada program yang belum ditemukan, selesaikan instalasi dari sumber resminya dahulu, lalu buka terminal baru. Bootstrap memasang dependency **aplikasi dan pengujian**, bukan otomatis memasang seluruh program komputer. Python dan tool AI tidak diperlukan. Internet diperlukan untuk clone, paket, image PostgreSQL, dan browser pengujian. Jangan menonaktifkan proteksi/global execution policy untuk melewati pesan error; catat error spesifiknya.
 
 ## 2. Ambil source dan jalankan
 
@@ -41,7 +39,7 @@ npm run dev
 
 Jika repo privat, akun GitHub lu perlu diundang oleh pemilik repo. Jangan menaruh token akses di file source atau URL yang dibagikan.
 
-**Apa yang dilakukan bootstrap:** memasang paket dari `composer.lock`/`package-lock.json`, menyiapkan runtime PHP proyek, Spec Kit dan Chromium, membuat rahasia/konfigurasi lokal bila belum ada, menyalakan PostgreSQL, menjalankan migrasi tambahan dan seed. Migrasi membuat/menyesuaikan struktur tabel; seed mengisi tiga akun dan tiga lapangan fiktif. Ini bukan perintah reset transaksi.
+**Apa yang dilakukan bootstrap:** memasang paket dari `composer.lock`/`package-lock.json`, menyiapkan runtime PHP proyek dan Chromium untuk tes browser, membuat rahasia/konfigurasi lokal bila belum ada, menyalakan PostgreSQL, menjalankan migrasi tambahan dan seed. Migrasi membuat/menyesuaikan struktur tabel; seed mengisi tiga akun dan tiga lapangan fiktif. Ini bukan perintah reset transaksi.
 
 **Apa yang dilakukan `npm run dev`:** menyalakan database bila perlu, menjalankan migrasi tambahan/seed idempoten, lalu Laravel dan Next.js. Idempoten berarti seed tidak menduplikasi data contoh yang sudah ada. Akun/harga contoh yang sudah diubah tidak otomatis di-reset ke awal.
 
@@ -53,6 +51,8 @@ Pada pemakaian berikutnya:
 cd demo-lolasport
 npm run dev
 ```
+
+Sesudah mengambil pembaruan repo, baca perubahan README dan lockfile. Bila dependency berubah, jalankan ulang `pwsh -File scripts/bootstrap.ps1` setelah menyimpan pekerjaan lokal. Jangan menyalin dependency teman dan jangan menghapus database agar setup bisa diteruskan.
 
 Jalankan hanya satu launcher per salinan. `Ctrl+C` pada terminal launcher menghentikan server yang diluncurkannya. Untuk menghentikan container database tanpa menghapus data:
 
@@ -103,7 +103,7 @@ Jalankan bergantian, bukan dalam dua terminal sekaligus. `doctor` memeriksa runt
 
 **Tes boleh membersihkan hanya `lola_demo_test`.** Guard memeriksa tujuan aktual sebelum cleanup. Runner browser memakai port 3002/8002, cookie/storage/build tersendiri. Jangan melemahkan guard agar tes lolos. Jangan menjalankan `migrate:fresh`, menghapus volume, atau `docker compose down -v` pada database demo.
 
-Laporan hasil browser lokal berada di `playwright-report/` dan `test-results/`; screenshot redesign historis tidak ikut clone karena berada di `.runtime/`. Baca [laporan versi 002](../specs/002-mobile-redesign/verification.md) dan [laporan penyerahan](../specs/003-team-handoff/verification.md). Hasil komputer pembuat tidak membuktikan komputer anggota sudah lulus.
+Laporan hasil browser lokal berada di `playwright-report/` dan `test-results/`; screenshot redesign historis tidak ikut clone karena berada di `.runtime/`. Baca [panduan dan hasil pengujian](PENGUJIAN.md). Hasil komputer pembuat tidak membuktikan komputer anggota sudah lulus.
 
 ## 6. Kalau belum berjalan
 
@@ -119,3 +119,11 @@ Laporan hasil browser lokal berada di `playwright-report/` dan `test-results/`; 
 - **macOS/Linux:** source dan CI menyediakan referensi, tetapi bootstrap Windows bukan petunjuk lintas OS yang sudah diuji. Catat kebutuhan adaptasi; jangan mengklaim langkah Windows bekerja persis sama.
 
 Jika meminta bantuan, sertakan OS, versi Node/PHP, perintah, error asli yang sudah disunting dari rahasia, dan apakah gagal sebelum atau sesudah halaman terbuka. Tidak perlu mengirim `.env` atau database.
+
+## 7. Bedakan source dan konfigurasi pribadi
+
+Yang diambil saat clone: frontend/backend, migration/seeder, tes, lockfile, Compose, skrip setup dan panduan. Migration menjelaskan struktur database; seeder membuat akun/lapangan contoh. Data transaksi komputer pembuat tidak ikut dibagikan.
+
+`.env.example` hanya contoh nama variabel dan nilai demo/placeholder. File `.env` aktual berisi password serta kunci lokal dan dibuat sendiri oleh bootstrap. Jangan mengganti template dengan salinan `.env` teman, dan jangan commit `.env`.
+
+Instruksi agent, skill, konfigurasi editor AI, serta arsip proses pribadi tidak diperlukan dan diabaikan Git. Mengembangkan aplikasi dapat dilakukan dengan editor biasa tanpa AI.

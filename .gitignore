@@ -23,6 +23,24 @@ apps/web/next-env.d.ts
 playwright-report/
 test-results/
 .playwright-cli/
-!.agents/
-docs/sources/*
-!docs/sources/README.md
+# Personal AI/editor workflow stays local, including generated agent instructions.
+.agents/
+.codex/
+.cursor/
+.specify/
+.claude/
+.ai/
+AGENTS.md
+CLAUDE.md
+GEMINI.md
+.mcp.json
+apps/api/boost.json
+/specs/
+scripts/boost-mcp.mjs
+scripts/capture-demo.mjs
+docs/STATE.md
+docs/START-HERE.md
+docs/WORKFLOW.md
+docs/TOOLS.md
+docs/PROMPT-MULAI.txt
+docs/sources/

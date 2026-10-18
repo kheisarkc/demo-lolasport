@@ -1,1 +1,0 @@
-Baca AGENTS.md, docs/START-HERE.md, docs/STATE.md dan specs/001-demo sebelum melanjutkan demo. Pertahankan isolasi database/runtime dan semua perubahan pengguna. Kerjakan tugas lokal yang diminta sampai diverifikasi; jangan push/deploy/reset database operasional atau mengklaim UAT.

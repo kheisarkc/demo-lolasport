@@ -15,8 +15,6 @@ if (-not (Test-Path -LiteralPath $composerPath)) { throw 'composer.phar was not 
 $npmCli = Join-Path (Split-Path -Parent $nodePath) 'node_modules\npm\bin\npm-cli.js'
 if (-not (Test-Path -LiteralPath $npmCli)) { throw 'Could not locate the npm CLI beside node.exe.' }
 $tools = @{php=$phpPath;composer=$composerPath;npmCli=$npmCli;docker=$dockerPath}
-$codexCommand = Get-Command codex -ErrorAction SilentlyContinue
-if ($codexCommand) { $tools.codex = $codexCommand.Source }
 $tools | ConvertTo-Json | Set-Content -LiteralPath (Join-Path $runtimePath 'tools.json') -Encoding utf8NoBOM
 $iniPath = Join-Path $runtimePath 'php.ini'
 if (-not (Test-Path -LiteralPath $iniPath)) {
@@ -42,32 +40,10 @@ try {
 } finally { Pop-Location }
 & $nodePath $npmCli ci --no-fund
 if ($LASTEXITCODE -ne 0) { throw 'npm ci failed.' }
-$specifyPath = Join-Path $runtimePath 'specify'
-if (-not (Test-Path -LiteralPath (Join-Path $specifyPath 'Scripts\specify.exe'))) {
-    & python -m venv $specifyPath
-    if ($LASTEXITCODE -ne 0) { throw 'Python 3.11+ is needed for the local Spec Kit CLI.' }
-    & (Join-Path $specifyPath 'Scripts\python.exe') -m pip install 'specify-cli==1.2.1'
-    if ($LASTEXITCODE -ne 0) { throw 'Spec Kit CLI install failed.' }
-}
-$configPath = Join-Path $projectPath '.codex'
-New-Item -ItemType Directory -Force -Path $configPath | Out-Null
-@"
-[mcp_servers.laravel-boost]
-command = 'node'
-args = ['scripts/boost-mcp.mjs']
-startup_timeout_sec = 30
-
-[mcp_servers.context7]
-command = 'node'
-args = ['node_modules/@upstash/context7-mcp/dist/index.js']
-startup_timeout_sec = 30
-"@ | Set-Content -LiteralPath (Join-Path $configPath 'config.toml') -Encoding utf8NoBOM
 if (-not $SkipBrowserDownload) {
     & $nodePath 'node_modules/@playwright/test/cli.js' install chromium
     if ($LASTEXITCODE -ne 0) { throw 'Playwright browser install failed.' }
-    & $nodePath 'node_modules/playwright/cli.js' install chromium
-    if ($LASTEXITCODE -ne 0) { throw 'Playwright CLI browser install failed.' }
 }
 & $nodePath 'scripts/project.mjs' setup
 if ($LASTEXITCODE -ne 0) { throw 'Local environment setup failed. Ensure Docker Desktop is running.' }
-Write-Output 'Bootstrap finished. Open this repository as a trusted project in Codex, then run npm run doctor.'
+Write-Output 'Setup selesai. Jalankan npm run doctor, lalu npm run dev untuk membuka aplikasi.'
