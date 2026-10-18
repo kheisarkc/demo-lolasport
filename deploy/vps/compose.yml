@@ -1,0 +1,52 @@
+name: lola-sport-hosted-demo
+services:
+  db:
+    image: postgres:17-alpine@sha256:b0f9560a2de083e2cc7382e75f808c7381a32852a7ec49117deedb300e552b24
+    network_mode: host
+    command: ["postgres", "-p", "55433", "-c", "listen_addresses=127.0.0.1"]
+    environment:
+      POSTGRES_DB: lola_demo
+      POSTGRES_USER: lola
+      POSTGRES_PASSWORD: ${DB_PASSWORD:?Set DB_PASSWORD in the server-only .env}
+    volumes:
+      - database:/var/lib/postgresql/data
+    restart: unless-stopped
+    mem_limit: 256m
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -h 127.0.0.1 -p 55433 -U lola -d lola_demo"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+  api:
+    build:
+      context: ../..
+      dockerfile: deploy/vps/api.Dockerfile
+    network_mode: host
+    env_file: .env
+    environment:
+      DB_CONNECTION: pgsql
+      DB_HOST: 127.0.0.1
+      DB_PORT: "55433"
+      DB_DATABASE: lola_demo
+      DB_USERNAME: lola
+    volumes:
+      - storage:/var/www/html/storage
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: unless-stopped
+    mem_limit: 256m
+  web:
+    build:
+      context: ../..
+      dockerfile: deploy/vps/web.Dockerfile
+    network_mode: host
+    environment:
+      NODE_ENV: production
+      LARAVEL_API_URL: http://127.0.0.1:8001
+      NODE_OPTIONS: --max-old-space-size=256
+    restart: unless-stopped
+    mem_limit: 384m
+volumes:
+  database:
+  storage:

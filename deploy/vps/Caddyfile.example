@@ -1,0 +1,13 @@
+# Append this site to the existing Caddyfile; preserve other sites.
+YOUR-DEMO-HOSTNAME {
+    encode zstd gzip
+    @laravel path /api/v1/* /sanctum/*
+    handle @laravel {
+        reverse_proxy 127.0.0.1:8001
+    }
+    handle {
+        reverse_proxy 127.0.0.1:3001
+    }
+    header X-Content-Type-Options nosniff
+    header Referrer-Policy strict-origin-when-cross-origin
+}
