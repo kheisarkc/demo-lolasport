@@ -38,6 +38,14 @@ Source tes: [backend](../apps/api/tests), [konkurensi](../apps/api/tests/Concurr
 
 103 paket npm dan 7 paket Composer khusus AI/transitif tidak terpakai dilepas, tanpa mengubah versi paket lain. Daftar 152 file source yang dibagikan dan 74 tautan relatif diperiksa; tidak ada file agent, `.env` aktual, database, runtime, dependency terpasang atau nilai rahasia lokal dalam kandidat publikasi. 134 file instruksi/config/arsip kerja, termasuk launcher Codex dan konfigurasi Playwright CLI agent, dikeluarkan dari Git dengan salinan lokal dipertahankan. Riwayat Git tidak ditulis ulang; commit lama tetap merupakan sejarah, bukan isi source utama saat ini.
 
+## Pemeriksaan source bersih sebelum dibagikan
+
+18 Oktober 2026: workflow GitHub pada commit `7c9d564` berhenti dengan `TS2688: Cannot find type definition file for 'node'` saat memeriksa konfigurasi TypeScript tes di root. Tes backend di run tersebut sudah lulus 22 tes/147 assertion, tetapi E2E belum berjalan karena langkah sebelumnya gagal.
+
+Kegagalan tipe berhasil direproduksi dari snapshot file Git dalam folder sementara di luar proyek/fondasi, setelah `npm ci`. Root sekarang mendeklarasikan `@types/node` dan `typescript` secara langsung karena pemeriksaan tes root memakainya. Versi paket yang sudah ada tidak di-upgrade. Setelah lockfile baru dipasang pada salinan bersih, pemeriksaan tipe E2E, lint, pemeriksaan tipe frontend, serta build frontend lulus. Ini bukan klaim bootstrap penuh pada Windows baru atau komputer anggota.
+
+Delapan file template yang tidak dirujuk aplikasi dihapus: halaman welcome/CSS/JS bawaan Laravel serta lima SVG bawaan Next.js. Bukti pembayaran demo, kode aplikasi dan tes dipertahankan. Jalur mencoba pada README melewati unduhan browser tes; panduan menjelaskan pemasangannya saat E2E diperlukan. Hasil workflow terbaru dapat diperiksa di [GitHub Actions](https://github.com/kheisarkc/demo-lolasport/actions/workflows/check.yml).
+
 ## Membaca hasil dan batasnya
 
 Screenshot/laporan lokal berada di `.runtime/reports`, `playwright-report` dan `test-results`, diabaikan Git. Clone tidak membawa artefak komputer pembuat. Jangan memasukkan rahasia atau data nyata ke laporan.

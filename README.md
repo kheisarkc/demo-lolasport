@@ -20,11 +20,11 @@ Siapkan Git, **PowerShell 7 (`pwsh`)**, Node.js **22.16+**, PHP **8.4**, Compose
 ```powershell
 git clone https://github.com/kheisarkc/demo-lolasport.git
 cd demo-lolasport
-pwsh -File scripts/bootstrap.ps1
+pwsh -File scripts/bootstrap.ps1 -SkipBrowserDownload
 npm run dev
 ```
 
-Bootstrap memasang dependency sesuai lockfile, membuat konfigurasi serta rahasia lokal, lalu menyiapkan database dan data contoh. Unduhan memerlukan internet. Gunakan folder baru, bukan menimpa proyek yang sudah ada. PHP XAMPP 8.2 tidak memenuhi lockfile; jika tersedia, bootstrap memilih `C:\Tools\php84\php.exe`.
+Bootstrap memasang dependency sesuai lockfile, membuat konfigurasi serta rahasia lokal, lalu menyiapkan database dan data contoh. Opsi `-SkipBrowserDownload` melewati unduhan browser pengujian; aplikasi tetap bisa dibuka di browser biasa. Untuk menjalankan E2E nanti, ikuti [langkah pemasangan browser tes](docs/PANDUAN-KELOMPOK.md#5-periksa-hasil-perubahan). Unduhan memerlukan internet. Gunakan folder baru, bukan menimpa proyek yang sudah ada. PHP XAMPP 8.2 tidak memenuhi lockfile; jika tersedia, bootstrap memilih `C:\Tools\php84\php.exe`.
 
 Buka **http://127.0.0.1:3001**. Untuk pemakaian berikutnya cukup `npm run dev` dari root. `Ctrl+C` menghentikan server yang diluncurkan; `npm run db:stop` menghentikan database tanpa menghapus volume.
 

@@ -23,6 +23,8 @@
     "test:e2e:ui": "node scripts/project.mjs test:e2e --ui"
   },
   "devDependencies": {
-    "@playwright/test": "1.64.1"
+    "@playwright/test": "1.64.1",
+    "@types/node": "20.19.43",
+    "typescript": "5.9.3"
   }
 }

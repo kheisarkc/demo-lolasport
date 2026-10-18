@@ -33,13 +33,13 @@ Pilih folder kerja sendiri yang mudah ditemukan. Jangan clone ke folder proyek y
 ```powershell
 git clone https://github.com/kheisarkc/demo-lolasport.git
 cd demo-lolasport
-pwsh -File scripts/bootstrap.ps1
+pwsh -File scripts/bootstrap.ps1 -SkipBrowserDownload
 npm run dev
 ```
 
 Jika repo privat, akun GitHub lu perlu diundang oleh pemilik repo. Jangan menaruh token akses di file source atau URL yang dibagikan.
 
-**Apa yang dilakukan bootstrap:** memasang paket dari `composer.lock`/`package-lock.json`, menyiapkan runtime PHP proyek dan Chromium untuk tes browser, membuat rahasia/konfigurasi lokal bila belum ada, menyalakan PostgreSQL, menjalankan migrasi tambahan dan seed. Migrasi membuat/menyesuaikan struktur tabel; seed mengisi tiga akun dan tiga lapangan fiktif. Ini bukan perintah reset transaksi.
+**Apa yang dilakukan bootstrap:** memasang paket dari `composer.lock`/`package-lock.json`, menyiapkan runtime PHP proyek, membuat rahasia/konfigurasi lokal bila belum ada, menyalakan PostgreSQL, menjalankan migrasi tambahan dan seed. Migrasi membuat/menyesuaikan struktur tabel; seed mengisi tiga akun dan tiga lapangan fiktif. Ini bukan perintah reset transaksi. Opsi `-SkipBrowserDownload` cukup untuk mencoba aplikasi dan melewati unduhan Chromium khusus pengujian; browser biasa tetap bisa digunakan. Tanpa opsi itu, bootstrap juga mengunduh Chromium.
 
 **Apa yang dilakukan `npm run dev`:** menyalakan database bila perlu, menjalankan migrasi tambahan/seed idempoten, lalu Laravel dan Next.js. Idempoten berarti seed tidak menduplikasi data contoh yang sudah ada. Akun/harga contoh yang sudah diubah tidak otomatis di-reset ke awal.
 
@@ -92,6 +92,17 @@ Reservasi awal menahan slot maksimal 30 menit (atau sampai waktu mulai). Bukti t
 - **Pemilik → Penerimaan:** ganti hari ini/bulan ini/rentang khusus. Angka menjumlah approved pada tanggal persetujuan WIB, bukan tanggal bermain atau total seluruh booking.
 
 ## 5. Periksa hasil perubahan
+
+Bagian ini untuk anggota yang mengubah atau menguji kode. Jika hanya ingin mencoba demo, cukup jalankan skenario pada bagian 3–4; tidak perlu menjalankan seluruh tes.
+
+Sebelum E2E pertama, unduh Chromium khusus pengujian dari root repo. Perintah ini tidak menyentuh database. Lokasi unduhan harus sama dengan yang dipakai runner:
+
+```powershell
+$env:PLAYWRIGHT_BROWSERS_PATH = Join-Path (Get-Location).Path '.runtime\browsers'
+node node_modules/@playwright/test/cli.js install chromium
+```
+
+Kemudian jalankan pemeriksaan secara berurutan:
 
 ```powershell
 npm run doctor
