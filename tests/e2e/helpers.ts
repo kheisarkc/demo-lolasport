@@ -14,22 +14,21 @@ export async function logout(page: Page) { await page.goto('/akun'); await page.
 export async function noOverflow(page: Page) { expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), page.url()).toBe(true); }
 export async function chooseSlot(page: Page, days: number, court = 'Futsal Sintetis') {
   await page.goto(`/?date=${futureDay(days)}`);
+  await page.getByRole('tab', { name: new RegExp(court) }).click();
   await page.getByRole('heading', { name: court, exact: true }).waitFor();
-  const card = page.locator('.court-card').filter({ has: page.getByRole('heading', { name: court, exact: true }) });
-  await card.getByRole('button', { name: /Tersedia/ }).first().click();
+  await page.getByRole('button', { name: new RegExp(`^${court} .* Tersedia$`) }).first().click();
   await expect(page.getByRole('complementary', { name: 'Ringkasan pilihan' })).toBeVisible();
 }
 /** Mengisi data pemesan tanpa akun dan mengembalikan kode booking. */
 export async function confirmBooking(page: Page, name = 'Raka Uji', phone = '081234567890') {
   await page.getByLabel('Nama pemesan', { exact: true }).fill(name);
   await page.getByLabel('Nomor WhatsApp', { exact: true }).fill(phone);
-  await page.getByLabel('Saya sudah memeriksa').check();
-  await page.getByRole('button', { name: 'Konfirmasi reservasi', exact: true }).click();
+  await page.getByRole('button', { name: /^Pesan sekarang/ }).click();
   await expect(page).toHaveURL(/\/reservasi\/LS-[A-Z0-9]{6}/);
   return page.url().match(/\/reservasi\/(LS-[A-Z0-9]{6})/)![1];
 }
 export async function uploadProof(page: Page) {
-  await page.getByLabel('Bukti fiktif', { exact: true }).setInputFiles(resolve('apps/web/public/bukti-demo.png'));
+  await page.getByLabel('Bukti pembayaran', { exact: true }).setInputFiles(resolve('apps/web/public/bukti-demo.png'));
   await expect(page.getByAltText('Pratinjau bukti yang akan dikirim')).toBeVisible();
   await page.getByRole('button', { name: 'Kirim bukti pembayaran', exact: true }).click();
   await expect(page.getByText('Bukti terkirim. Pembayaran menunggu pemeriksaan pegawai.', { exact: true })).toBeVisible();

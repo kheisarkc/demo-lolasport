@@ -1,2 +1,2 @@
-import { StaffHomePage } from '../../components/staff';
-export default function Page() { return <StaffHomePage/>; }
+import { redirect } from 'next/navigation';
+export default function Page() { redirect('/pegawai/jadwal'); }

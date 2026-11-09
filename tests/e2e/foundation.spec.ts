@@ -11,6 +11,6 @@ test('the demo catalog is readable without horizontal overflow', async ({ page }
   await page.goto('/');
   await expect(page.getByRole('heading', { name: 'Cari waktu mainmu' })).toBeVisible();
   await expect(page.getByRole('heading', { name: 'Futsal Sintetis', exact: true })).toBeVisible();
-  await expect(page.getByText('Prototipe', { exact: true })).toBeVisible();
+  await expect(page.getByRole('tab', { name: /Futsal Vinil/ })).toBeVisible();
   await noOverflow(page);
 });

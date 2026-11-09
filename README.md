@@ -4,7 +4,7 @@ Demo futsal/badminton untuk belajar dan diskusi kelompok capstone, dapat dijalan
 
 **Ini eksperimen pribadi berbantuan AI, belum menjadi hasil final kelompok atau UAT pengelola.** Harga, DP, tenggat, dan kebijakan pembatalan memakai [asumsi simulasi](docs/DEMO-ASSUMPTIONS.md). Tidak ada rekening/QR aktif atau payment gateway.
 
-**Coba tanpa instalasi:** [Demo online Lola Sport](https://lola.43.173.6.29.sslip.io). Akun tersedia pada bagian **Akun demo untuk mencoba** di halaman masuk. Gunakan data fiktif; demo online memakai database bersama yang terpisah dari komputer anggota. Ketersediaan link mengikuti masa aktif VPS dan DNS. Konfigurasi serta panduan pengelolaan tersedia di [deploy/vps](deploy/vps/README.md).
+**Coba tanpa instalasi:** [Demo online Lola Sport](https://lola.43.173.6.29.sslip.io). Di halaman masuk ada tombol **Penjaga** dan **Pemilik** untuk langsung masuk dengan akun contoh. Gunakan data fiktif; demo online memakai database bersama yang terpisah dari komputer anggota. Ketersediaan link mengikuti masa aktif VPS dan DNS. Konfigurasi serta panduan pengelolaan tersedia di [deploy/vps](deploy/vps/README.md).
 
 ## Mulai sesuai tujuan
 

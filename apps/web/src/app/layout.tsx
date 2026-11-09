@@ -5,7 +5,7 @@ import './globals.css';
 
 export const metadata: Metadata = {
   title: 'Lola Sport | Demo Reservasi Lapangan',
-  description: 'Demo lokal reservasi futsal dan badminton. Data dan pembayaran simulasi.',
+  description: 'Reservasi lapangan futsal dan badminton Lola Sport.',
   robots: { index: false, follow: false },
 };
 export const viewport: Viewport = { width: 'device-width', initialScale: 1, viewportFit: 'cover', themeColor: '#136348' };

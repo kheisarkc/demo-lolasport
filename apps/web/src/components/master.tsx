@@ -14,7 +14,7 @@ function SettingsContent() {
     {resource.loading ? <Loading/> : resource.data && <><RulesForm key={`${resource.data.dp_percent}-${resource.data.hold_minutes}`} settings={resource.data} done={() => { resource.refresh(); setMessage('Aturan pemesanan disimpan.'); }}/>
     <div className="section-title"><h2>Lapangan dan harga</h2><span>{resource.data.courts.length} lapangan</span></div>
     {!resource.data.courts.length ? <Empty title="Belum ada lapangan"><p>Tambahkan lapangan untuk mulai menyusun jadwal.</p></Empty> : <div className="master-list">{resource.data.courts.map(c => <article className="master-item" key={c.id}><span className={`sport-icon ${c.sport}`}><Icon name="court"/></span><div className="master-info"><h2>{c.name}</h2><p>{c.sport === 'futsal' ? 'Futsal' : 'Badminton'} · {hourText(c.open_hour)}–{hourText(c.close_hour)}</p><strong>{rupiah(c.hourly_rate)} / jam</strong></div><Badge value={c.active ? 'confirmed' : 'cancelled'}>{c.active ? 'Aktif' : 'Nonaktif'}</Badge><button className="secondary" aria-label={`Edit ${c.name}`} onClick={() => update({ edit: c.id }, true)}>Edit</button></article>)}</div>}</>}
-    <p className="fine-print">Jam buka semua lapangan 07.00–01.00. Lapangan dengan pesanan aktif tidak dapat dinonaktifkan. Harga pesanan lama tetap tersimpan.</p>
+    <p className="fine-print">Jam buka semua lapangan 07.00–01.00. Lapangan yang masih punya pesanan aktif tidak bisa dinonaktifkan.</p>
     {(edit === 'new' || court) && <CourtEditor key={edit} court={court} close={() => update({ edit: null })} done={() => { update({ edit: null }); resource.refresh(); setMessage('Data lapangan disimpan. Harga pesanan lama tetap.'); }}/>}</section>;
 }
 function RulesForm({ settings, done }: { settings: Settings; done: () => void }) {
@@ -22,7 +22,7 @@ function RulesForm({ settings, done }: { settings: Settings; done: () => void })
   return <form className="surface stack" onSubmit={e => { e.preventDefault(); const form = new FormData(e.currentTarget); action.run(async () => { await api('/owner/settings', 'PUT', { dp_percent: Number(form.get('dp_percent')), hold_minutes: Number(form.get('hold_minutes')) }); done(); }); }}>
     <h2>Aturan pemesanan</h2><Failure error={action.error}/>
     <div className="two-fields"><Field label="DP minimal (%)" name="dp_percent" error={action.error}><input name="dp_percent" type="number" inputMode="numeric" min={1} max={100} defaultValue={settings.dp_percent} required/></Field><Field label="Batas bayar (menit)" name="hold_minutes" error={action.error}><input name="hold_minutes" type="number" inputMode="numeric" min={5} max={120} defaultValue={settings.hold_minutes} required/></Field></div>
-    <p className="fine-print">DP 50% dari pemilik (8 Nov 2026). Batas bayar 30 menit keputusan tim, bisa diubah di sini.</p>
+    
     <button disabled={action.busy}>{action.busy ? 'Menyimpan…' : 'Simpan aturan'}</button></form>;
 }
 function CourtEditor({ court, close, done }: { court?: Court; close: () => void; done: () => void }) {

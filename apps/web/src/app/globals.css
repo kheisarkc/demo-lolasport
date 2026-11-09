@@ -2102,3 +2102,55 @@ dialog .actions {
   .detail-grid>div.stack>.review-payment,.detail-grid>div.stack>.schedule-card { order: 0; }
   .detail-grid>aside { order: 1; }
 }
+
+/* Revisi UX 10 Nov: tab lapangan, pilihan tombol, QRIS, tanpa footer. */
+.court-tabs { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 6px; margin: 4px 0 14px; scrollbar-width: thin; }
+.court-tabs button { flex: 0 0 auto; display: flex; flex-direction: column; align-items: flex-start; gap: 2px; min-height: 52px; padding: 8px 14px; font-size: 14px; }
+.court-tabs button small { font-size: 11px; font-weight: 500; opacity: .85; }
+.court-panel { background: var(--paper); border: 1px solid var(--line); border-radius: var(--radius); padding: 16px; }
+.court-panel-heading { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; flex-wrap: wrap; margin-bottom: 12px; }
+.court-panel-heading h2 { font-size: 18px; margin: 0; }
+.court-panel-heading span { font-size: 13px; color: var(--muted); }
+.slot-hint { font-size: 13px; color: var(--muted); margin: 12px 0 0; }
+.slot small { font-size: 11px; }
+.selection-bar { display: grid; grid-template-columns: minmax(0,1fr) auto; align-items: center; gap: 4px 12px; }
+.selection-bar>.button { grid-column: 1 / -1; }
+.selection-description strong { display: block; font-size: 15px; }
+.selection-description span { font-size: 12px; color: var(--muted); }
+.selection-total { text-align: right; }
+.selection-total small { display: block; font-size: 11px; color: var(--muted); }
+.with-selection { padding-bottom: 150px; }
+@media(min-width:600px) { .selection-bar { grid-template-columns: minmax(0,1fr) auto auto; } .selection-bar>.button { grid-column: auto; width: auto; } .with-selection { padding-bottom: 110px; } }
+.field-label { display: block; font-weight: 600; font-size: 14px; margin-bottom: 8px; }
+.choice-group { display: flex; flex-wrap: wrap; gap: 8px; }
+.choice-group button { flex: 1 1 0; min-width: 72px; min-height: 48px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; font-size: 14px; }
+.choice-group button span { font-size: 12px; font-weight: 500; }
+.choice-group button strong { font-size: 15px; }
+.amount-fixed { display: flex; justify-content: space-between; align-items: baseline; background: #edf5ef; border-radius: 10px; padding: 12px 14px; }
+.amount-fixed strong { font-size: 20px; }
+.qris-box { display: flex; gap: 14px; align-items: center; border: 1px solid var(--line); border-radius: 12px; padding: 12px; background: #fff; }
+.qris-box span { display: block; font-size: 13px; color: var(--muted); margin-top: 4px; }
+.qris-mark { width: 104px; height: 104px; flex: 0 0 auto; color: #10261c; }
+.file-input { padding: 10px; background: #f7faf8; border-style: dashed; }
+.sample-link { font-size: 13px; }
+.rules-note { font-size: 13px; color: var(--muted); background: #f4f7f4; border-radius: 10px; padding: 10px 12px; margin: 0; }
+.checkout-summary h2 { margin: 2px 0 6px; }
+.checkout-when { margin: 0 0 12px; }
+.code-callout { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+.code-callout p { margin: 0; }
+.message .code-callout strong, .code-callout p strong { display: inline; font-size: 17px; letter-spacing: .5px; }
+.copy-button { min-height: 40px; padding: 6px 14px; font-size: 13px; }
+.schedule-head { display: flex; justify-content: space-between; gap: 10px; align-items: flex-start; }
+.schedule-head h2 { margin: 0; }
+.schedule-head p { margin: 2px 0 0; color: var(--muted); }
+.schedule-head .badges { display: flex; flex-direction: column; align-items: flex-end; gap: 4px; }
+.attention-link { display: flex; align-items: center; gap: 8px; background: #fff6df; border: 1px solid #ecd28b; color: #6b4a00; border-radius: 10px; padding: 12px 14px; margin: 0 0 14px; text-decoration: none; font-size: 14px; }
+.attention-link strong { font-size: 18px; }
+.attention-link span { margin-left: auto; font-size: 18px; }
+.agenda-booking .badge { flex: 0 0 auto; }
+.agenda-time { display: flex; align-items: center; justify-content: center; }
+.demo-accounts { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
+.demo-accounts .actions { margin: 0; }
+.verification-card h2 { font-size: 17px; margin: 0; }
+@media(max-width:999px) { .app-body::after { content: ''; display: block; height: calc(var(--nav-height) + 16px + env(safe-area-inset-bottom)); } }
+.court-tabs button.selected small { color: #fff; opacity: .9; }

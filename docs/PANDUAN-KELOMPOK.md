@@ -73,11 +73,11 @@ Kata sandi: **`DemoLola2026!`**.
 Data awal dari wawancara pemilik: Futsal Sintetis Rp130.000/jam, Futsal Vinil Rp160.000/jam, Badminton 1 dan 2 Rp35.000/jam, buka 07.00–01.00 WIB. Aturan lengkap: [DEMO-ASSUMPTIONS.md](DEMO-ASSUMPTIONS.md).
 
 1. Masuk sebagai pemilik di `/masuk`, buka **Penerimaan**, pilih **Hari ini**, lalu catat total awal. Keluar melalui **Akun**.
-2. Di `/`, pilih tanggal, Futsal Sintetis dan satu jam tersedia. Klik **Lanjutkan**. Tidak perlu masuk.
-3. Pada checkout, isi nama dan nomor WhatsApp fiktif, centang konfirmasi, lalu buat reservasi. Catat kode booking `LS-XXXXXX`.
-4. Unduh contoh PNG fiktif, isi Rp65.000 (DP 50%) dan unggah. Nilai diterima masih Rp0; status menunggu verifikasi.
+2. Di `/`, pilih tanggal dan tab **Futsal Sintetis**, ketuk jam mulai (ketuk jam lain sesudahnya untuk main lebih lama). Klik **Lanjutkan**. Tidak perlu masuk.
+3. Pada checkout, isi nama dan nomor WhatsApp fiktif, lalu **Pesan sekarang**. Catat kode booking `LS-XXXXXX` (ada tombol salin).
+4. Pilih **DP Rp65.000**, unduh contoh bukti dari tautan di formulir, unggah, lalu kirim. Nilai diterima masih Rp0; status menunggu verifikasi.
 5. Masuk sebagai penjaga, buka **Verifikasi**, periksa bukti, lalu setujui. Pesanan terkonfirmasi dengan sisa Rp65.000.
-6. Buka detail pesanan yang sama sebagai penjaga, catat pelunasan **Tunai** Rp65.000. Tagihan lunas; tombol **Hadir** muncul mulai 60 menit sebelum main.
+6. Buka detail pesanan yang sama sebagai penjaga, pilih **Tunai**, klik **Catat Rp65.000 diterima**. Tagihan lunas; tombol **Hadir** muncul mulai 60 menit sebelum main.
 7. Pemilik membuka **Penerimaan**. Kenaikan terhadap total awal seharusnya Rp130.000 (QRIS Rp65.000 + Tunai Rp65.000).
 8. Coba juga: tolak bukti DP pertama (pesanan langsung batal), walk-in dari **Jadwal**, dan **Cek pesanan** dari perangkat lain dengan kode + WhatsApp.
 

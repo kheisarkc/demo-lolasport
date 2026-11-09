@@ -87,6 +87,10 @@ export function Field({ label, name, error, children, hint }: { label: string; n
   const messages = error instanceof ApiError ? error.fields[name] : undefined;
   return <div className="field"><label htmlFor={id}>{label}</label>{cloneElement(children as ReactElement<{ id?: string; 'aria-describedby'?: string; 'aria-invalid'?: boolean }>, { id, 'aria-describedby': hint || messages ? `${id}-description` : undefined, 'aria-invalid': !!messages })}{(hint || messages) && <div id={`${id}-description`}>{hint && <small>{hint}</small>}{messages && <p className="field-error" role="alert">{messages.join(' ')}</p>}</div>}</div>;
 }
+/** Pilihan tombol (mengganti dropdown/isian angka untuk pilihan yang sedikit). */
+export function Choice<T extends string | number>({ label, value, options, onChange }: { label: string; value: T; options: [T, ReactNode][]; onChange: (value: T) => void }) {
+  return <div className="field"><span className="field-label">{label}</span><div className="choice-group" role="radiogroup" aria-label={label}>{options.map(([option, text]) => <button type="button" key={String(option)} role="radio" aria-checked={option === value} className={option === value ? 'selected' : 'secondary'} onClick={() => onChange(option)}>{text}</button>)}</div></div>;
+}
 export function SearchField({ label, value, placeholder, search }: { label: string; value: string; placeholder: string; search: (value: string) => void }) {
   const id = useId();
   return <form className="field" onSubmit={e => { e.preventDefault(); search(String(new FormData(e.currentTarget).get('query') || '')); }}><label htmlFor={id}>{label}</label><div className="search-control"><input key={value} id={id} name="query" type="search" defaultValue={value} placeholder={placeholder}/><button className="secondary">Cari</button></div></form>;

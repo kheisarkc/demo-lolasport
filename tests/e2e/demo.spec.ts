@@ -6,8 +6,18 @@ test('guest books without an account → staff verifies DP → cash settlement �
   const days = testInfo.project.name === 'mobile-chromium' ? 4 : 3;
   await chooseSlot(page, days);
   await page.getByRole('link', { name: 'Lanjutkan', exact: true }).click();
-  await expect(page.getByText('Minimal DP (50%)')).toBeVisible();
+  await expect(page.getByText('DP minimal (50%)')).toBeVisible();
   await expect(page.getByText(/unggah bukti dalam 30 menit/)).toBeVisible();
+  // Durasi: ketuk jam terakhir untuk memperpanjang, lalu kembali ke 1 jam.
+  await page.goBack();
+  const chosen = page.getByRole('button', { name: /Futsal Sintetis .* Dipilih$/ });
+  await expect(chosen).toHaveCount(1);
+  await page.getByRole('button', { name: /^Futsal Sintetis .* Tersedia$/ }).first().click();
+  await expect(chosen).toHaveCount(2);
+  await expect(page.getByText('· 2 jam')).toBeVisible();
+  await chosen.first().click();
+  await expect(chosen).toHaveCount(1);
+  await page.getByRole('link', { name: 'Lanjutkan', exact: true }).click();
   const code = await confirmBooking(page);
   await expect(page.getByText(`Simpan kode ${code}`, { exact: false })).toBeVisible();
   await expect(page.getByRole('timer')).toBeVisible();
@@ -29,12 +39,10 @@ test('guest books without an account → staff verifies DP → cash settlement �
   await login(page, 'pegawai');
   await page.goto(`/pegawai/verifikasi/${code}`);
   await page.getByRole('button', { name: 'Setujui pembayaran', exact: true }).click();
-  await page.getByRole('button', { name: 'Ya, setujui pembayaran', exact: true }).click();
   await expect(page.getByText('Pembayaran disetujui dan tercatat.')).toBeVisible();
   await page.goto(`/reservasi/${code}`);
   await expect(page.getByTestId('paid-amount')).toHaveText(/65\.000/);
-  await page.getByRole('button', { name: 'Periksa pencatatan', exact: true }).click();
-  await page.getByRole('button', { name: 'Catat diterima', exact: true }).click();
+  await page.getByRole('button', { name: /^Catat .* diterima$/ }).click();
   await expect(page.getByText('Pembayaran tunai diterima dan tercatat.')).toBeVisible();
   await expect(page.getByTestId('paid-amount')).toHaveText(/130\.000/);
   await logout(page);
@@ -74,9 +82,9 @@ test('staff records a walk-in with DP at the counter and closes a slot', async (
   await page.goto(`/pegawai/jadwal?date=${date}`);
   await page.getByRole('button', { name: /Tambah jadwal/ }).first().click();
   await page.getByLabel('Nama pelanggan').fill('Tim Senja');
-  await page.getByLabel('Cara bayar').selectOption('qris');
-  await page.getByLabel('Dibayar sekarang').fill('65000');
-  await page.getByRole('button', { name: 'Catat walk-in dan pembayaran', exact: true }).click();
+  await page.getByRole('radio', { name: 'QRIS di tempat' }).click();
+  await page.getByRole('radio', { name: /^DP/ }).click();
+  await page.getByRole('button', { name: /^Catat walk-in/ }).click();
   await expect(page).toHaveURL(/\/reservasi\/LS-/);
   await expect(page.getByTestId('paid-amount')).toHaveText(/65\.000/);
   await expect(page.getByRole('timer')).toHaveCount(0);
