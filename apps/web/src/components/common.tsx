@@ -9,7 +9,10 @@ export const dayKey = (date = new Date()) => new Intl.DateTimeFormat('en-CA', { 
 export const addDays = (day: string, amount: number) => dayKey(new Date(new Date(`${day}T12:00:00+07:00`).getTime() + amount * 86400000));
 export const dateLabel = (day: string) => { const date = new Date(`${day}T12:00:00+07:00`); return Number.isNaN(date.getTime()) ? day : new Intl.DateTimeFormat('id-ID', { dateStyle: 'medium', timeZone: 'Asia/Jakarta' }).format(date); };
 export const timeLabel = (time: string) => new Intl.DateTimeFormat('id-ID', { hour: '2-digit', minute: '2-digit', timeZone: 'Asia/Jakarta' }).format(new Date(time));
-export const holding = (status: string) => ['pending', 'review', 'confirmed'].includes(status);
+export const holding = (status: string) => ['pending', 'review', 'confirmed', 'checked_in'].includes(status);
+export const active = (status: string) => ['pending', 'review', 'confirmed'].includes(status);
+/** Awal slot (jam 24 = 00.00 hari berikutnya) dalam milidetik. */
+export const slotTime = (day: string, hour: number) => Date.parse(`${day}T00:00:00+07:00`) + hour * 3600000;
 export function useNow() {
   const [now, setNow] = useState(() => Date.now());
   useEffect(() => { const timer = setInterval(() => setNow(Date.now()), 15000); return () => clearInterval(timer); }, []);
@@ -82,9 +85,9 @@ export function Dialog({ title, children, close, busy = false }: { title: string
   useEffect(() => { const node = ref.current; const previous = document.activeElement as HTMLElement; node?.showModal(); return () => { node?.close(); previous?.focus(); }; }, []);
   return <dialog ref={ref} aria-labelledby={id} onCancel={e => { e.preventDefault(); if (!busy) close(); }}><div className="dialog-heading"><h2 id={id}>{title}</h2><button className="icon-button secondary" aria-label="Tutup dialog" disabled={busy} onClick={close}>×</button></div>{children}</dialog>;
 }
-export function DateStrip({ date, today, onChange }: { date: string; today: string; onChange: (value: string) => void }) {
+export function DateStrip({ date, today, onChange, maxDays = 30 }: { date: string; today: string; onChange: (value: string) => void; maxDays?: number }) {
   const week = Array.from({ length: 7 }, (_, i) => addDays(today, i));
   const validDate = !Number.isNaN(Date.parse(`${date}T12:00:00+07:00`));
-  const dates = week.includes(date) || !validDate ? week : [...week.slice(0, 2), ...Array.from({ length: 5 }, (_, i) => addDays(date, i))].filter(value => value <= addDays(today, 90));
-  return <section className="date-picker" aria-label="Pilih tanggal"><div className="date-picker-heading"><strong>{dateLabel(date)}</strong><label className="calendar-input">Tanggal<input aria-label="Tanggal bermain" type="date" value={date} min={today} max={addDays(today, 90)} onChange={e => { if (e.target.value) onChange(e.target.value); }}/></label></div><div className="date-strip">{dates.map(value => <button key={value} aria-pressed={date === value} className={date === value ? 'selected' : ''} onClick={() => onChange(value)}><span>{value === today ? 'Hari ini' : value === addDays(today, 1) ? 'Besok' : new Intl.DateTimeFormat('id-ID', { weekday: 'short', timeZone: 'Asia/Jakarta' }).format(new Date(`${value}T12:00:00+07:00`))}</span><strong>{value.slice(-2)}</strong></button>)}</div></section>;
+  const dates = week.includes(date) || !validDate ? week : [...week.slice(0, 2), ...Array.from({ length: 5 }, (_, i) => addDays(date, i))].filter(value => value <= addDays(today, maxDays));
+  return <section className="date-picker" aria-label="Pilih tanggal"><div className="date-picker-heading"><strong>{dateLabel(date)}</strong><label className="calendar-input">Tanggal<input aria-label="Tanggal bermain" type="date" value={date} min={today} max={addDays(today, maxDays)} onChange={e => { if (e.target.value) onChange(e.target.value); }}/></label></div><div className="date-strip">{dates.map(value => <button key={value} aria-pressed={date === value} className={date === value ? 'selected' : ''} onClick={() => onChange(value)}><span>{value === today ? 'Hari ini' : value === addDays(today, 1) ? 'Besok' : new Intl.DateTimeFormat('id-ID', { weekday: 'short', timeZone: 'Asia/Jakarta' }).format(new Date(`${value}T12:00:00+07:00`))}</span><strong>{value.slice(-2)}</strong></button>)}</div></section>;
 }

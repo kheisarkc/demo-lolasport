@@ -1,5 +1,8 @@
 # Keputusan arsitektur dan pengembangan
 
+> **Pembaruan 10 Nov 2026:** aturan demo disamakan dengan lola-sport-v1 (pelanggan tanpa akun, harga dari pemilik, jam 07.00–01.00, batas bayar 30 menit, hadir/tidak datang, pengaturan oleh pemilik). Bila isi di bawah berbeda, yang berlaku [DEMO-ASSUMPTIONS.md](DEMO-ASSUMPTIONS.md).
+
+
 Keputusan ini berlaku untuk demo lokal, bukan persetujuan pengelola atas kebijakan usaha.
 
 - **Pembagian tanggung jawab:** Laravel menguasai aturan/otorisasi/transaksi/database; Next.js App Router TypeScript menguasai UI/proxy. PostgreSQL dipertahankan.

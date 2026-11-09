@@ -4,26 +4,27 @@ namespace App\Http\Controllers;
 
 use App\Models\Booking;
 use App\Models\Court;
+use App\Models\Setting;
 use App\Services\BookingService;
-use Carbon\CarbonImmutable;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
-use Illuminate\Validation\ValidationException;
 
 class CourtController extends Controller
 {
+    /** Jadwal publik satu tanggal operasional (07.00 sampai 01.00 dini hari berikutnya). */
     public function index(Request $request, BookingService $service): JsonResponse
     {
         $data = $request->validate(['date' => 'nullable|date_format:Y-m-d']);
-        $date = $data['date'] ?? now('Asia/Jakarta')->format('Y-m-d');
+        $date = $data['date'] ?? BookingService::today()->format('Y-m-d');
         $service->expire();
-        $courts = Court::where('active', true)->orderBy('id')->get()->map(function (Court $court) use ($date) {
-            $day = CarbonImmutable::parse($date, 'Asia/Jakarta');
-            $busy = Booking::where('court_id', $court->id)->whereIn('status', Booking::HOLDING)->where('starts_at', '<', $day->addDay()->utc())->where('ends_at', '>', $day->utc())->get();
+        $dayStart = BookingService::slotStart($date, config('demo.open_hour'));
+        $dayEnd = BookingService::slotStart($date, config('demo.close_hour'));
+        $courts = Court::where('active', true)->orderBy('id')->get()->map(function (Court $court) use ($date, $dayStart, $dayEnd) {
+            $busy = Booking::where('court_id', $court->id)->whereIn('status', Booking::HOLDING)->where('starts_at', '<', $dayEnd->utc())->where('ends_at', '>', $dayStart->utc())->get();
             $slots = [];
-            for ($hour = $court->open_hour; $hour < $court->close_hour; $hour++) {
-                $start = $day->setHour($hour)->utc();
+            for ($hour = config('demo.open_hour'); $hour < config('demo.close_hour'); $hour++) {
+                $start = BookingService::slotStart($date, $hour)->utc();
                 $end = $start->addHour();
                 $occupied = $busy->first(fn (Booking $b) => $b->starts_at->lt($end) && $b->ends_at->gt($start));
                 $status = $occupied ? ($occupied->source === 'block' ? 'blocked' : 'booked') : ($start->isFuture() ? 'available' : 'past');
@@ -32,25 +33,40 @@ class CourtController extends Controller
 
             return [...$court->toArray(), 'slots' => $slots];
         });
+        $setting = Setting::current();
 
-        return response()->json(['date' => $date, 'server_now' => now()->toIso8601String(), 'timezone' => 'Asia/Jakarta', 'courts' => $courts, 'dp_percent' => config('demo.dp_percent'), 'hold_minutes' => config('demo.hold_minutes')]);
+        return response()->json([
+            'date' => $date, 'today' => BookingService::today()->format('Y-m-d'), 'max_days_ahead' => config('demo.max_days_ahead'),
+            'server_now' => now()->toIso8601String(), 'timezone' => 'Asia/Jakarta', 'courts' => $courts,
+            'dp_percent' => $setting->dp_percent, 'hold_minutes' => $setting->hold_minutes,
+        ]);
     }
 
-    public function all(): JsonResponse
+    /** Pengaturan pemilik: harga lapangan, DP, dan batas bayar. */
+    public function settings(): JsonResponse
     {
-        Gate::authorize('staff');
+        Gate::authorize('owner');
+        $setting = Setting::current();
 
-        return response()->json(Court::orderBy('id')->get());
+        return response()->json(['courts' => Court::orderBy('id')->get(), 'dp_percent' => $setting->dp_percent, 'hold_minutes' => $setting->hold_minutes]);
+    }
+
+    public function updateSettings(Request $request, BookingService $service): JsonResponse
+    {
+        Gate::authorize('owner');
+        $data = $request->validate(['dp_percent' => 'required|integer|min:1|max:100', 'hold_minutes' => 'required|integer|min:5|max:120']);
+        $setting = Setting::current();
+        $before = $setting->only('dp_percent', 'hold_minutes');
+        $setting->update($data);
+        $service->audit(null, $request->user(), 'settings_updated', ['before' => $before, 'after' => $data]);
+
+        return response()->json($setting);
     }
 
     public function store(Request $request, BookingService $service): JsonResponse
     {
-        Gate::authorize('staff');
-        $data = $request->validate($this->rules());
-        if ($data['open_hour'] >= $data['close_hour']) {
-            throw ValidationException::withMessages(['close_hour' => 'Jam tutup harus setelah jam buka.']);
-        }
-        $court = Court::create($data);
+        Gate::authorize('owner');
+        $court = Court::create($request->validate($this->rules()));
         $service->audit(null, $request->user(), 'court_created', ['court_id' => $court->id]);
 
         return response()->json($court, 201);
@@ -58,17 +74,12 @@ class CourtController extends Controller
 
     public function update(Request $request, Court $court, BookingService $service): JsonResponse
     {
-        Gate::authorize('staff');
+        Gate::authorize('owner');
         $data = $request->validate($this->rules(true, $court->id));
         $updated = $service->locked($court->id, function (Court $current) use ($data, $request, $service) {
             $before = $current->toArray();
             $current->fill($data);
-            if ($current->open_hour >= $current->close_hour) {
-                throw ValidationException::withMessages(['close_hour' => 'Jam tutup harus setelah jam buka.']);
-            }
-            foreach (Booking::where('court_id', $current->id)->whereIn('status', Booking::HOLDING)->where('ends_at', '>', now())->get() as $booking) {
-                abort_if(! $current->active || $booking->starts_at->setTimezone('Asia/Jakarta')->hour < $current->open_hour || $booking->ends_at->setTimezone('Asia/Jakarta')->hour > $current->close_hour, 409, 'Perubahan mematahkan jadwal yang sudah terpesan.');
-            }
+            abort_if(! $current->active && Booking::where('court_id', $current->id)->whereIn('status', Booking::HOLDING)->where('ends_at', '>', now())->where('source', '!=', 'block')->exists(), 409, 'Masih ada pesanan aktif di lapangan ini. Selesaikan dulu sebelum menonaktifkan.');
             $current->save();
             $service->audit(null, $request->user(), 'court_updated', ['court_id' => $current->id, 'before' => $before, 'after' => $current->toArray()]);
 
@@ -82,6 +93,6 @@ class CourtController extends Controller
     {
         $required = $partial ? 'sometimes|required' : 'required';
 
-        return ['name' => "$required|string|max:80|unique:courts,name,".($id ?? 'NULL'), 'sport' => "$required|in:futsal,badminton", 'hourly_rate' => "$required|integer|min:1|max:10000000", 'open_hour' => "$required|integer|min:0|max:22", 'close_hour' => "$required|integer|min:1|max:23", 'active' => 'sometimes|boolean'];
+        return ['name' => "$required|string|max:80|unique:courts,name,".($id ?? 'NULL'), 'sport' => "$required|in:futsal,badminton", 'hourly_rate' => "$required|integer|min:1000|max:10000000", 'active' => 'sometimes|boolean'];
     }
 }

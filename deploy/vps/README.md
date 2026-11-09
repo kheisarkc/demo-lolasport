@@ -24,6 +24,10 @@ docker compose --env-file deploy/vps/.env -f deploy/vps/compose.yml up -d web
 5. Tambahkan site dari `Caddyfile.example` ke konfigurasi Caddy dengan hostname yang benar. Backup konfigurasi lama, validasi dengan `caddy validate`, lalu reload. DNS harus menunjuk ke VPS dan port 80/443 harus dapat diakses untuk HTTPS.
 6. Periksa `/api/health`, katalog, login ketiga peran, dan akses tanpa login. Periksa layanan lama tetap merespons.
 
+## Update cepat
+
+Setelah perubahan di-push ke `main`, jalankan di VPS: `sudo bash /opt/lola-sport-demo/deploy/vps/update.sh`. Skrip membackup database (`pg_dump`) dan source ke `/opt/lola-backups`, mengambil source terbaru dari GitHub tanpa menyentuh `deploy/vps/.env`, lalu build, migrate, dan cek health. Pakai `sudo FRESH=1 bash ...` hanya bila database demo memang perlu dibuat ulang (skema berubah besar).
+
 ## Operasional
 
 - Periksa `docker compose --env-file deploy/vps/.env -f deploy/vps/compose.yml ps` dan `logs --tail=50` dari root source. Output konfigurasi lengkap dapat berisi rahasia; jangan bagikan.

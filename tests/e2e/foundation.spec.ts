@@ -10,7 +10,7 @@ test('the frontend can reach Laravel and PostgreSQL', async ({ request }) => {
 test('the demo catalog is readable without horizontal overflow', async ({ page }) => {
   await page.goto('/');
   await expect(page.getByRole('heading', { name: 'Cari waktu mainmu' })).toBeVisible();
-  await expect(page.getByRole('heading', { name: 'Futsal Arena', exact: true })).toBeVisible();
-  await expect(page.getByText('Demo lokal', { exact: true })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Futsal Sintetis', exact: true })).toBeVisible();
+  await expect(page.getByText('Prototipe', { exact: true })).toBeVisible();
   await noOverflow(page);
 });

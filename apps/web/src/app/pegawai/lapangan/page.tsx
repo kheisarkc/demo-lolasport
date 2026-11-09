@@ -1,2 +1,2 @@
-import { MasterPage } from '../../../components/master';
-export default function Page() { return <MasterPage/>; }
+import { redirect } from 'next/navigation';
+export default function Page() { redirect('/pegawai'); }

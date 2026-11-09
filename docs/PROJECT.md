@@ -1,5 +1,8 @@
 # Kebutuhan dan batas demo Lola Sport
 
+> **Pembaruan 10 Nov 2026:** aturan demo disamakan dengan lola-sport-v1 (pelanggan tanpa akun, harga dari pemilik, jam 07.00–01.00, batas bayar 30 menit, hadir/tidak datang, pengaturan oleh pemilik). Bila isi di bawah berbeda, yang berlaku [DEMO-ASSUMPTIONS.md](DEMO-ASSUMPTIONS.md).
+
+
 Demo reservasi futsal/badminton dengan tiga peran: pelanggan, pegawai dan pemilik. Tujuannya menyatukan jadwal, reservasi, pembayaran manual dan penerimaan agar dapat ditelusuri. Ini eksperimen pribadi berbantuan AI sebagai bahan belajar, belum hasil final kelompok atau UAT pengelola.
 
 ## Kebutuhan utama

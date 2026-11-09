@@ -34,13 +34,13 @@ Jika sudah pernah clone versi lama, simpan perubahan sendiri dahulu, ambil pemba
 
 ## Akun dan alur mencoba
 
-Kata sandi ketiga akun: **`DemoLola2026!`**. Gunakan hanya data dan bukti fiktif.
+Aturan sudah disamakan dengan lola-sport-v1 (10 Nov 2026), lihat [aturan demo](docs/DEMO-ASSUMPTIONS.md). Pelanggan **tidak perlu akun**. Kata sandi kedua akun: **`DemoLola2026!`**. Gunakan hanya data dan bukti fiktif.
 
-- Pelanggan: `pelanggan@lola.test` — pilih jadwal, konfirmasi, kirim bukti DP/pelunasan, lihat reservasi sendiri.
-- Pegawai: `pegawai@lola.test` — agenda, walk-in, blok pemeliharaan, verifikasi, tunai, dan master lapangan.
-- Pemilik: `pemilik@lola.test` — laporan pembayaran approved menurut tanggal persetujuan WIB.
+- Pelanggan: tanpa akun — pilih jadwal, isi nama + WhatsApp, kirim bukti QRIS, buka lagi lewat **Cek pesanan** (kode + WhatsApp).
+- Penjaga: `pegawai@lola.test` — agenda, walk-in (bayar minimal DP), tutup lapangan, verifikasi QRIS, tunai/QRIS di tempat, hadir/tidak datang.
+- Pemilik: `pemilik@lola.test` — laporan penerimaan dan pengaturan harga, DP, batas bayar.
 
-Coba **pelanggan → reservasi futsal Rp150.000 → bukti DP Rp75.000 → pegawai setujui → pelunasan Rp75.000 → pegawai setujui → pemilik cocokkan kenaikan Rp150.000**. Bukti fiktif PNG dapat diunduh dari formulir pembayaran; mengunggah bukti belum menambah penerimaan. [Langkah lengkap dan skenario tambahan](docs/PANDUAN-KELOMPOK.md#3-coba-alur-utama).
+Coba **pelanggan tanpa akun → Futsal Sintetis 1 jam Rp130.000 → bukti DP Rp65.000 → penjaga setujui → penjaga catat pelunasan tunai Rp65.000 → pemilik cocokkan kenaikan Rp130.000**. Bukti fiktif PNG dapat diunduh dari formulir pembayaran; mengunggah bukti belum menambah penerimaan. [Langkah lengkap dan skenario tambahan](docs/PANDUAN-KELOMPOK.md#3-coba-alur-utama).
 
 ## Struktur dan pemeriksaan
 

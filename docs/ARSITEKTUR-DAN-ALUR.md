@@ -1,5 +1,8 @@
 # Memahami source Lola Sport
 
+> **Pembaruan 10 Nov 2026:** aturan demo disamakan dengan lola-sport-v1 (pelanggan tanpa akun, harga dari pemilik, jam 07.00–01.00, batas bayar 30 menit, hadir/tidak datang, pengaturan oleh pemilik). Bila isi di bawah berbeda, yang berlaku [DEMO-ASSUMPTIONS.md](DEMO-ASSUMPTIONS.md).
+
+
 [← README](../README.md) · [Mencoba aplikasi](PANDUAN-KELOMPOK.md) · [Mengubah bersama](../CONTRIBUTING.md)
 
 ## 1. Mulai dari tujuan

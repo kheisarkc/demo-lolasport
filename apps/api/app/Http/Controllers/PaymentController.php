@@ -15,9 +15,14 @@ class PaymentController extends Controller
 {
     public function store(Request $request, Booking $booking, BookingService $service): JsonResponse
     {
-        Gate::authorize('update', $booking);
-        abort_if($request->input('method') === 'cash' && $request->user()->role !== 'staff', 403, 'Tunai hanya dicatat pegawai.');
-        $data = $request->validate(['amount' => 'required|integer|min:1|max:2000000000', 'method' => 'required|in:transfer,qris,cash', 'proof' => 'required_unless:method,cash|nullable|file|mimes:jpg,jpeg,png,pdf|extensions:jpg,jpeg,png,pdf|max:2048']);
+        abort_unless(BookingController::canAccess($request, $booking), 403);
+        $staff = $request->user()?->role === 'staff';
+        abort_if(! $staff && $request->input('method') !== 'qris', 403, 'Tunai dicatat penjaga di tempat.');
+        $data = $request->validate([
+            'amount' => 'required|integer|min:1|max:2000000000',
+            'method' => $staff ? 'required|in:cash,qris' : 'required|in:qris',
+            'proof' => $staff ? 'prohibited' : 'required|file|mimes:jpg,jpeg,png,pdf|extensions:jpg,jpeg,png,pdf|max:2048',
+        ]);
 
         return response()->json($service->submit($booking, $request->user(), $data, $request->file('proof')), 201);
     }
@@ -30,9 +35,9 @@ class PaymentController extends Controller
         return response()->json($service->review($payment, $request->user(), $data['decision'], $data['reason'] ?? null));
     }
 
-    public function proof(Payment $payment): StreamedResponse
+    public function proof(Request $request, Payment $payment): StreamedResponse
     {
-        Gate::authorize('view', $payment->booking);
+        abort_unless(BookingController::canAccess($request, $payment->booking), 403);
         abort_unless($payment->proof_path && Storage::disk('local')->exists($payment->proof_path), 404);
 
         return Storage::disk('local')->download($payment->proof_path, 'bukti-demo-'.$payment->id.'.'.pathinfo($payment->proof_path, PATHINFO_EXTENSION), ['X-Content-Type-Options' => 'nosniff', 'Cache-Control' => 'private, no-store']);

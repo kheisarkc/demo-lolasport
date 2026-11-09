@@ -1,2 +1,2 @@
-import { AuthPage } from '../../components/auth';
-export default function Page() { return <AuthPage register/>; }
+import { redirect } from 'next/navigation';
+export default function Page() { redirect('/'); }

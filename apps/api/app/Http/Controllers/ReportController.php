@@ -18,14 +18,21 @@ class ReportController extends Controller
         $to = CarbonImmutable::parse($data['to'] ?? now('Asia/Jakarta')->format('Y-m-d'), 'Asia/Jakarta');
         $payments = Payment::with('booking.court', 'booking.payments')->where('status', 'approved')->where('reviewed_at', '>=', $from->utc())->where('reviewed_at', '<', $to->addDay()->utc())->orderByDesc('reviewed_at')->get();
         $totalsByKind = ['dp' => 0, 'settlement' => 0, 'full' => 0];
+        $totalsByMethod = ['cash' => 0, 'qris' => 0];
+        $forfeited = 0;
         foreach ($payments as $payment) {
             $first = $payment->booking->payments->where('status', 'approved')->sortBy([['reviewed_at', 'asc'], ['id', 'asc']])->first();
             $kind = $first->id !== $payment->id ? 'settlement' : ($payment->amount >= $payment->booking->total ? 'full' : 'dp');
             $payment->setAttribute('kind', $kind);
             $totalsByKind[$kind] += $payment->amount;
+            $totalsByMethod[$payment->method] = ($totalsByMethod[$payment->method] ?? 0) + $payment->amount;
+            // DP hangus: pesanan batal atau tidak datang, uang tetap milik Lola Sport.
+            if (in_array($payment->booking->status, ['cancelled', 'no_show'], true)) {
+                $forfeited += $payment->amount;
+            }
         }
         $group = fn (string $format) => $payments->groupBy(fn (Payment $p) => $p->reviewed_at->setTimezone('Asia/Jakarta')->format($format))->map(fn ($items, $period) => ['period' => $period, 'total' => (int) $items->sum('amount'), 'count' => $items->count()])->sortBy('period')->values();
 
-        return response()->json(['label' => 'Penerimaan pembayaran', 'from' => $from->format('Y-m-d'), 'to' => $to->format('Y-m-d'), 'timezone' => 'Asia/Jakarta', 'total' => (int) $payments->sum('amount'), 'totals_by_kind' => $totalsByKind, 'count' => $payments->count(), 'daily' => $group('Y-m-d'), 'monthly' => $group('Y-m'), 'transactions' => $payments]);
+        return response()->json(['label' => 'Penerimaan pembayaran', 'from' => $from->format('Y-m-d'), 'to' => $to->format('Y-m-d'), 'timezone' => 'Asia/Jakarta', 'total' => (int) $payments->sum('amount'), 'totals_by_kind' => $totalsByKind, 'totals_by_method' => $totalsByMethod, 'forfeited' => $forfeited, 'count' => $payments->count(), 'daily' => $group('Y-m-d'), 'monthly' => $group('Y-m'), 'transactions' => $payments]);
     }
 }

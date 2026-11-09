@@ -18,6 +18,8 @@ class AppServiceProvider extends ServiceProvider
     {
         Gate::define('staff', fn ($user) => $user->role === 'staff');
         Gate::define('owner', fn ($user) => $user->role === 'owner');
+        RateLimiter::for('booking', fn (Request $request) => Limit::perMinute(20)->by($request->ip()));
+        RateLimiter::for('lookup', fn (Request $request) => Limit::perMinute(10)->by($request->ip()));
         RateLimiter::for('login', fn (Request $request) => Limit::perMinute(15)->by(strtolower((string) $request->input('email')).'|'.$request->ip()));
         if ($this->app->environment('e2e') && (config('database.default') !== 'pgsql'
             || config('database.connections.pgsql.database') !== 'lola_demo_test'

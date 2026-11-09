@@ -23,7 +23,7 @@ while (microtime(true) < $input['start']) {
 $began = microtime(true);
 try {
     $service = app(BookingService::class);
-    $user = User::findOrFail($input['user']);
+    $user = $input['user'] === null ? null : User::findOrFail($input['user']);
     $result = match ($input['action']) {
         'create' => $service->create($user, $input['data']),
         'review' => $service->review(Payment::findOrFail($input['payment']), $user, 'approved', null),

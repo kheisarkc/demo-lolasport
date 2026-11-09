@@ -66,21 +66,22 @@ GitHub bukan hosting demo. Alamat `127.0.0.1` menunjuk komputer lu sendiri, buka
 
 Kata sandi: **`DemoLola2026!`**.
 
-- Pelanggan `pelanggan@lola.test`.
-- Pegawai `pegawai@lola.test`.
+- Pelanggan: tanpa akun (nama + WhatsApp).
+- Penjaga `pegawai@lola.test`.
 - Pemilik `pemilik@lola.test`.
 
-Data awal: Futsal Arena Rp150.000/jam, Badminton 1 dan 2 masing-masing Rp50.000/jam, buka 08.00–22.00 WIB. Ini bukan klaim inventaris atau harga usaha nyata.
+Data awal dari wawancara pemilik: Futsal Sintetis Rp130.000/jam, Futsal Vinil Rp160.000/jam, Badminton 1 dan 2 Rp35.000/jam, buka 07.00–01.00 WIB. Aturan lengkap: [DEMO-ASSUMPTIONS.md](DEMO-ASSUMPTIONS.md).
 
-1. Masuk sebagai pemilik di `/masuk`, buka `/pemilik/laporan`, pilih **Hari ini**, lalu catat total awal. Keluar melalui `/akun`.
-2. Di `/`, pilih tanggal mendatang, lapangan futsal dan satu jam tersedia. Klik **Lanjutkan**, masuk sebagai pelanggan. Pilihan tetap ada, tetapi reservasi belum dibuat.
-3. Pada checkout, periksa tanggal, waktu, harga, minimal DP dan aturan. Centang konfirmasi, lalu buat reservasi. Detail memakai `/reservasi/{id}`; catat ID.
-4. Pada formulir pembayaran, unduh contoh PNG fiktif, pilih transfer demo, isi Rp75.000 dan unggah PNG tersebut. Nilai diterima masih Rp0; status menunggu verifikasi. Tidak ada transfer uang sungguhan.
-5. Keluar, masuk sebagai pegawai, buka **Verifikasi**. Cari ID, buka/perbesar bukti, lalu setujui. DP diterima membuat booking terkonfirmasi dengan sisa Rp75.000.
-6. Masuk kembali sebagai pelanggan, buka **Reservasi saya**, lalu detail yang sama. Kirim pelunasan Rp75.000. Pegawai memeriksa dan menyetujuinya seperti langkah sebelumnya.
-7. Pemilik membuka periode yang mencakup kedua persetujuan. Kenaikan terhadap total awal seharusnya Rp150.000, terdiri dari dua pembayaran terkait booking. Jika ada transaksi contoh lain, cocokkan ID dan rincian, bukan hanya total keseluruhan.
+1. Masuk sebagai pemilik di `/masuk`, buka **Penerimaan**, pilih **Hari ini**, lalu catat total awal. Keluar melalui **Akun**.
+2. Di `/`, pilih tanggal, Futsal Sintetis dan satu jam tersedia. Klik **Lanjutkan**. Tidak perlu masuk.
+3. Pada checkout, isi nama dan nomor WhatsApp fiktif, centang konfirmasi, lalu buat reservasi. Catat kode booking `LS-XXXXXX`.
+4. Unduh contoh PNG fiktif, isi Rp65.000 (DP 50%) dan unggah. Nilai diterima masih Rp0; status menunggu verifikasi.
+5. Masuk sebagai penjaga, buka **Verifikasi**, periksa bukti, lalu setujui. Pesanan terkonfirmasi dengan sisa Rp65.000.
+6. Buka detail pesanan yang sama sebagai penjaga, catat pelunasan **Tunai** Rp65.000. Tagihan lunas; tombol **Hadir** muncul mulai 60 menit sebelum main.
+7. Pemilik membuka **Penerimaan**. Kenaikan terhadap total awal seharusnya Rp130.000 (QRIS Rp65.000 + Tunai Rp65.000).
+8. Coba juga: tolak bukti DP pertama (pesanan langsung batal), walk-in dari **Jadwal**, dan **Cek pesanan** dari perangkat lain dengan kode + WhatsApp.
 
-Reservasi awal menahan slot maksimal 30 menit (atau sampai waktu mulai). Bukti tepat waktu mempertahankan slot selama review. Harga/DP/tenggat mengikuti konfigurasi dan master aktual; contoh di atas memakai seed awal. Gunakan [asumsi lengkap](DEMO-ASSUMPTIONS.md) untuk memahami pembatalan, penolakan, dan batas nominal.
+Reservasi awal menahan slot maksimal 30 menit (atau sampai waktu mulai). Bukti tepat waktu mempertahankan slot selama review. Harga/DP/batas bayar mengikuti pengaturan pemilik; contoh di atas memakai seed awal. Gunakan [asumsi lengkap](DEMO-ASSUMPTIONS.md) untuk memahami pembatalan, penolakan, dan batas nominal.
 
 ## 4. Coba fitur lain
 
