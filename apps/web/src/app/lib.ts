@@ -21,19 +21,29 @@ export function saveBookingToken(code: string, token: string) { try { localStora
 export function proofUrl(payment: Payment, code: string) { const token = bookingTokens()[code]; return `/api/v1/payments/${payment.id}/proof${token ? `?token=${token}` : ''}`; }
 
 export class ApiError extends Error { constructor(message: string, public status: number, public fields: Record<string, string[]> = {}) { super(message); } }
+const xsrfCookie = () => document.cookie.split('; ').find(c => c.startsWith('XSRF-TOKEN='))?.substring(11);
+/** Token CSRF dipakai ulang; diminta ke server hanya bila belum ada (hemat satu bolak-balik per aksi). */
+async function ensureCsrf(force = false) {
+  if (!force && xsrfCookie()) return;
+  const csrf = await fetch('/sanctum/csrf-cookie', { credentials: 'include' });
+  if (!csrf.ok) throw new ApiError('Sesi tidak dapat disiapkan. Coba lagi.', csrf.status);
+}
 export async function api<T>(path: string, method = 'GET', data?: Record<string, unknown> | FormData): Promise<T> {
-  const headers: Record<string, string> = { Accept: 'application/json' };
   const code = path.match(/^\/bookings\/(LS-[A-Z0-9]+)/)?.[1];
   const token = code ? bookingTokens()[code] : undefined;
-  if (token) headers['X-Booking-Token'] = token;
-  if (method !== 'GET') {
-    const csrf = await fetch('/sanctum/csrf-cookie', { credentials: 'include' });
-    if (!csrf.ok) throw new ApiError('Sesi tidak dapat disiapkan. Coba lagi.', csrf.status);
-    const cookie = document.cookie.split('; ').find(c => c.startsWith('XSRF-TOKEN='));
-    if (cookie) headers['X-XSRF-TOKEN'] = decodeURIComponent(cookie.substring(11));
-    if (!(data instanceof FormData)) headers['Content-Type'] = 'application/json';
+  async function send() {
+    const headers: Record<string, string> = { Accept: 'application/json' };
+    if (token) headers['X-Booking-Token'] = token;
+    if (method !== 'GET') {
+      const cookie = xsrfCookie();
+      if (cookie) headers['X-XSRF-TOKEN'] = decodeURIComponent(cookie);
+      if (!(data instanceof FormData)) headers['Content-Type'] = 'application/json';
+    }
+    return fetch(`/api/v1${path}`, { method, credentials: 'include', headers, cache: 'no-store', body: data instanceof FormData ? data : data ? JSON.stringify(data) : undefined });
   }
-  const response = await fetch(`/api/v1${path}`, { method, credentials: 'include', headers, cache: 'no-store', body: data instanceof FormData ? data : data ? JSON.stringify(data) : undefined });
+  if (method !== 'GET') await ensureCsrf();
+  let response = await send();
+  if (response.status === 419 && method !== 'GET') { await ensureCsrf(true); response = await send(); }
   const result = await response.json().catch(() => ({}));
   if (!response.ok) {
     const fallback: Record<number, string> = { 401: 'Sesi berakhir. Silakan masuk kembali.', 403: 'Akun ini tidak memiliki akses.', 404: 'Data tidak ditemukan atau sudah tidak tersedia.', 419: 'Sesi berubah. Silakan coba lagi.', 429: 'Terlalu banyak percobaan. Tunggu sebentar.', 500: 'Layanan belum merespons dengan benar. Coba lagi.' };

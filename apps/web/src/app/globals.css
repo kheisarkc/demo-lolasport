@@ -2076,3 +2076,29 @@ dialog .actions {
 }
 
 .date-strip button { border-color: #71877a; }
+
+/* Ringkas: jam lebih padat, harga tidak diulang, agenda tidak terlalu tinggi. */
+.slot { min-height: 58px; padding: 8px 4px; gap: 2px; }
+.slot strong { font-size: 16px; }
+.slot-grid { grid-template-columns: repeat(4,minmax(0,1fr)); }
+.agenda-slot { min-height: 0; }
+.agenda-time { padding: 10px 6px; }
+.agenda-time small { margin-top: 2px; }
+.agenda-available { padding: 10px 14px; }
+.agenda-available small { margin-top: 2px; }
+.agenda-booking { padding: 10px 14px; }
+.agenda-booking span:not(.badge) { margin: 2px 0 6px; }
+.agenda-unavailable { padding: 12px 16px; }
+@media(min-width:600px) { .slot-grid { grid-template-columns: repeat(6,minmax(0,1fr)); } }
+@media(min-width:1000px) {
+  .slot-grid { grid-template-columns: repeat(6,minmax(0,1fr)); }
+  .agenda-columns { grid-template-columns: repeat(4,minmax(0,1fr)); }
+}
+/* HP: setelah kartu jadwal langsung form bayar / aksi, baru tagihan dan riwayat. */
+@media(max-width:999px) {
+  .detail-grid { display: flex; flex-direction: column; gap: 0; }
+  .detail-grid>div.stack { display: contents; }
+  .detail-grid>div.stack>* { order: 2; }
+  .detail-grid>div.stack>.review-payment,.detail-grid>div.stack>.schedule-card { order: 0; }
+  .detail-grid>aside { order: 1; }
+}

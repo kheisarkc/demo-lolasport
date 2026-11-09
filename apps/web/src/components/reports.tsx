@@ -2,11 +2,11 @@
 
 import { useState } from 'react';
 import { ApiError, dateTime, labels, Report, rupiah } from '../app/lib';
-import { dateLabel, Empty, Failure, Field, Heading, Loading, useQuery, useResource } from './common';
+import { dateLabel, Empty, Failure, Field, Heading, Loading, useQuery, useResource, useToday } from './common';
 import { Guard } from './shell';
 
 const kinds = { dp: 'DP', settlement: 'Pelunasan', full: 'Bayar penuh' };
-export function ReportsPage({ today }: { today: string }) { return <Guard roles={['owner']}><ReportContent today={today}/></Guard>; }
+export function ReportsPage() { const today = useToday(true); return <Guard roles={['owner']}>{today ? <ReportContent today={today}/> : <Loading/>}</Guard>; }
 function ReportContent({ today }: { today: string }) {
   const { params, update } = useQuery(); const from = params.get('from') || `${today.slice(0, 7)}-01`; const to = params.get('to') || today;
   const [custom, setCustom] = useState(false); const [validation, setValidation] = useState<Error | null>(null); const [page, setPage] = useState(1);

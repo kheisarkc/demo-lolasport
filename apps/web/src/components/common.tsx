@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
-import { cloneElement, ReactElement, ReactNode, useCallback, useEffect, useId, useRef, useState } from 'react';
+import { cloneElement, ReactElement, ReactNode, useCallback, useEffect, useId, useRef, useState, useSyncExternalStore } from 'react';
 import { api, ApiError, labels } from '../app/lib';
 
 export const dayKey = (date = new Date()) => new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Jakarta', year: 'numeric', month: '2-digit', day: '2-digit' }).format(date);
@@ -27,6 +27,10 @@ export function useQuery() {
   }
   return { params, update };
 }
+const resourceCache = new Map<string, unknown>();
+/** Hapus data tersimpan, misalnya saat ganti akun. */
+export const clearResourceCache = () => resourceCache.clear();
+/** Data terakhir untuk alamat yang sama langsung ditampilkan, lalu diperbarui diam-diam (tanpa layar memuat berulang). */
 export function useResource<T>(path: string | null) {
   const [version, setVersion] = useState(0);
   const key = `${path}:${version}`;
@@ -34,10 +38,17 @@ export function useResource<T>(path: string | null) {
   useEffect(() => {
     if (!path) return;
     let active = true;
-    api<T>(path).then(data => { if (active) setState({ key, data }); }).catch(error => { if (active) setState({ key, error }); });
+    api<T>(path).then(data => { resourceCache.set(path, data); if (active) setState({ key, data }); }).catch(error => { if (active) setState({ key, error }); });
     return () => { active = false; };
   }, [path, key]);
-  return { data: state.key === key ? state.data : undefined, error: state.key === key ? state.error : undefined, loading: !!path && state.key !== key, refresh: useCallback(() => setVersion(v => v + 1), []) };
+  const fresh = state.key === key;
+  const data = fresh ? state.data : path ? resourceCache.get(path) as T | undefined : undefined;
+  return { data, error: fresh ? state.error : undefined, loading: !!path && !fresh && data === undefined, refreshing: !!path && !fresh, refresh: useCallback(() => setVersion(v => v + 1), []) };
+}
+const everyMinute = (callback: () => void) => { const timer = setInterval(callback, 60000); return () => clearInterval(timer); };
+/** Tanggal hari ini dihitung di perangkat (halaman bisa disiapkan lebih dulu). Operasional: 00.00–00.59 masih hari sebelumnya. */
+export function useToday(calendar = false) {
+  return useSyncExternalStore(everyMinute, () => dayKey(new Date(Date.now() - (calendar ? 0 : 3600000))), () => null);
 }
 export function useAction() {
   const pending = useRef(false); const [busy, setBusy] = useState(false); const [error, setError] = useState<Error | null>(null);

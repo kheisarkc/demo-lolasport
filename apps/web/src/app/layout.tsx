@@ -9,7 +9,6 @@ export const metadata: Metadata = {
   robots: { index: false, follow: false },
 };
 export const viewport: Viewport = { width: 'device-width', initialScale: 1, viewportFit: 'cover', themeColor: '#136348' };
-export const dynamic = 'force-dynamic';
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return <html lang="id"><body><Suspense fallback={<div className="loading-state" role="status">Menyiapkan Lola Sport…</div>}><AppShell>{children}</AppShell></Suspense></body></html>;

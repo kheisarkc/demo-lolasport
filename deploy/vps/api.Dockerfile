@@ -12,4 +12,6 @@ RUN composer install --no-dev --prefer-dist --no-interaction --optimize-autoload
 COPY deploy/vps/apache.conf /etc/apache2/sites-available/000-default.conf
 RUN printf 'Listen 127.0.0.1:8001\n' > /etc/apache2/ports.conf \
     && printf 'ServerName localhost\n' > /etc/apache2/conf-enabled/servername.conf \
-    && printf 'upload_max_filesize=6M\npost_max_size=8M\nmemory_limit=128M\nexpose_php=Off\n' > /usr/local/etc/php/conf.d/lola.ini
+    && printf 'upload_max_filesize=6M\npost_max_size=8M\nmemory_limit=128M\nexpose_php=Off\nopcache.validate_timestamps=0\n' > /usr/local/etc/php/conf.d/lola.ini
+# Cache konfigurasi/route/event dibuat saat container start (butuh .env server); gagal cache tidak menghentikan layanan.
+CMD ["sh", "-c", "php artisan optimize || true; exec apache2-foreground"]

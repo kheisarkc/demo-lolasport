@@ -2,14 +2,14 @@
 
 import Link from 'next/link';
 import { Catalog, Court, hourText, rupiah, Slot } from '../app/lib';
-import { DateStrip, dateLabel, Empty, Failure, Heading, Icon, Loading, useQuery, useResource } from './common';
+import { DateStrip, dateLabel, Empty, Failure, Heading, Icon, Loading, useQuery, useResource, useToday } from './common';
 import { RoleHome } from './shell';
 
 export const slotLabels: Record<Slot['status'], string> = { available: 'Tersedia', booked: 'Terisi', blocked: 'Ditutup', past: 'Lewat' };
 export function availableDurations(court: Court, hour: number) {
   return Array.from({ length: Math.max(0, Math.min(18, court.close_hour - hour)) }, (_, i) => i + 1).filter(duration => Array.from({ length: duration }, (_, i) => hour + i).every(h => court.slots?.some(slot => slot.hour === h && slot.available)));
 }
-export function CatalogPage({ today }: { today: string }) { return <RoleHome><CatalogContent today={today}/></RoleHome>; }
+export function CatalogPage() { const today = useToday(); return <RoleHome>{today ? <CatalogContent today={today}/> : <Loading/>}</RoleHome>; }
 function CatalogContent({ today }: { today: string }) {
   const { params, update } = useQuery();
   const date = /^\d{4}-\d{2}-\d{2}$/.test(params.get('date') || '') ? params.get('date')! : today;
@@ -27,11 +27,11 @@ function CatalogContent({ today }: { today: string }) {
     {resource.loading ? <Loading text="Memuat jadwal lapangan…"/> : resource.data && <>
       <div className="section-title"><h2>Lapangan tersedia</h2><span>{visible.length} lapangan</span></div>
       {!visible.length && <Empty title="Belum ada lapangan untuk pilihan ini"><p>Ganti jenis olahraga atau tanggal.</p><button className="secondary" onClick={() => update({ sport: 'all' })}>Lihat semua olahraga</button></Empty>}
-      <div className="court-list">{visible.map(item => <article className="court-card" key={item.id}><div className={`court-ribbon ${item.sport}`} aria-hidden="true"><span/><Icon name="court"/></div><div className="court-content"><div className="court-title"><div><small>{item.sport === 'futsal' ? 'Futsal' : 'Badminton'}</small><h3>{item.name}</h3><span>{hourText(item.open_hour)}–{hourText(item.close_hour)} WIB</span></div><p className="court-price">{rupiah(item.hourly_rate)}<small>/ jam</small></p></div><div className="slot-grid">{item.slots?.map(slot => {
+      <div className="court-list">{visible.map(item => <article className="court-card" key={item.id}><div className={`court-ribbon ${item.sport}`} aria-hidden="true"><span/><Icon name="court"/></div><div className="court-content"><div className="court-title"><div><small>{item.sport === 'futsal' ? 'Futsal' : 'Badminton'}</small><h3>{item.name}</h3><span>{hourText(item.open_hour)}–{hourText(item.close_hour)} WIB</span></div><p className="court-price">{rupiah(item.hourly_rate)}<small>/ jam</small></p></div><div className="slot-grid">{item.slots?.filter(slot => slot.status !== 'past').map(slot => {
         const chosen = item.id === court?.id && hour === slot.hour && valid;
-        return <button key={slot.hour} disabled={!slot.available} aria-pressed={chosen} className={`slot slot-${slot.status}${chosen ? ' chosen' : ''}`} aria-label={`${item.name} ${hourText(slot.hour)} ${chosen ? 'Dipilih' : slotLabels[slot.status]}`} onClick={() => update({ court: item.id, hour: slot.hour, duration: 1 })}><strong>{hourText(slot.hour)}</strong><span>{rupiah(item.hourly_rate).replace(/\s/g, ' ')}</span><small>{chosen ? '✓ Dipilih' : slot.status === 'available' ? '+ Tersedia' : slot.status === 'blocked' ? '⊘ Ditutup' : slotLabels[slot.status]}</small></button>;
+        return <button key={slot.hour} disabled={!slot.available} aria-pressed={chosen} className={`slot slot-${slot.status}${chosen ? ' chosen' : ''}`} aria-label={`${item.name} ${hourText(slot.hour)} ${chosen ? 'Dipilih' : slotLabels[slot.status]}`} onClick={() => update({ court: item.id, hour: slot.hour, duration: 1 })}><strong>{hourText(slot.hour)}</strong><small>{chosen ? '✓ Dipilih' : slot.status === 'available' ? 'Tersedia' : slot.status === 'blocked' ? 'Ditutup' : slotLabels[slot.status]}</small></button>;
       })}</div></div></article>)}</div>
-      <p className="fine-print">Jam 00.00 masuk tanggal yang dipilih (dini hari berikutnya). Slot ditahan setelah reservasi dibuat, bukan saat dipilih. Pesan paling jauh 30 hari ke depan.</p>
+      <p className="fine-print">Harga per jam tertera di samping nama lapangan. Jam 00.00 masuk tanggal yang dipilih (dini hari berikutnya). Slot ditahan setelah reservasi dibuat, bukan saat dipilih. Pesan paling jauh 30 hari ke depan.</p>
     </>}
     {court && !valid && !resource.loading && <div className="message warning" role="status"><strong>Pilihan perlu diperbarui</strong><p>Slot sudah terisi, lewat, atau durasi tidak tersedia. Pilih jam lain di atas.</p></div>}
     {court && valid && <aside className="selection-bar" aria-label="Ringkasan pilihan"><div className="selection-description"><strong>{court.name}</strong><span>{dateLabel(date)} · {hourText(hour)}–{hourText(hour + duration)}</span></div><label className="duration-control">Durasi<select aria-label="Durasi" value={duration} onChange={e => update({ duration: e.target.value })}>{availableDurations(court, hour).map(d => <option key={d} value={d}>{d} jam</option>)}</select></label><div className="selection-total"><small>Total sewa</small><strong>{rupiah(court.hourly_rate * duration)}</strong></div><Link className="button" href={checkout}>Lanjutkan<Icon name="arrow"/></Link></aside>}
