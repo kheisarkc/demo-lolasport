@@ -38,7 +38,7 @@ function CatalogContent({ today }: { today: string }) {
         <div className="court-panel-heading"><h2>{court.name}</h2><span>{court.sport === 'futsal' ? 'Futsal' : 'Badminton'} · {rupiah(court.hourly_rate)} / jam</span></div>
         {!slots.length ? <Empty title="Jadwal tanggal ini sudah lewat"><p>Pilih tanggal lain.</p></Empty> : <div className="slot-grid">{slots.map(slot => {
           const chosen = valid && slot.hour >= hour && slot.hour < hour + duration;
-          return <button key={slot.hour} disabled={!slot.available} aria-pressed={chosen} className={`slot slot-${slot.status}${chosen ? ' chosen' : ''}`} aria-label={`${court.name} ${hourText(slot.hour)} ${chosen ? 'Dipilih' : slotLabels[slot.status]}`} onClick={() => pick(slot)}><strong>{hourText(slot.hour)}</strong><small>{chosen ? '✓' : slotLabels[slot.status]}</small></button>;
+          return <button key={slot.hour} disabled={!slot.available} aria-pressed={chosen} className={`slot slot-${slot.status}${chosen ? ' chosen' : ''}`} aria-label={`${court.name} ${hourText(slot.hour)} ${chosen ? 'Dipilih' : slotLabels[slot.status]}`} onClick={() => pick(slot)}><strong>{hourText(slot.hour)}–{hourText(slot.hour + 1)}</strong><small>{chosen ? '✓' : slotLabels[slot.status]}</small></button>;
         })}</div>}
         <p className="slot-hint">{valid ? 'Mau main lebih lama? Ketuk jam terakhir main.' : 'Ketuk jam mulai main. Jam 00.00 masih masuk tanggal yang dipilih.'}</p>
       </section>

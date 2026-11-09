@@ -2154,3 +2154,9 @@ dialog .actions {
 .verification-card h2 { font-size: 17px; margin: 0; }
 @media(max-width:999px) { .app-body::after { content: ''; display: block; height: calc(var(--nav-height) + 16px + env(safe-area-inset-bottom)); } }
 .court-tabs button.selected small { color: #fff; opacity: .9; }
+/* Kotak jam menampilkan rentang 07.00–08.00. */
+.slot-grid { grid-template-columns: repeat(3,minmax(0,1fr)); }
+.slot strong { font-size: 14px; white-space: nowrap; }
+@media(min-width:600px) { .slot-grid { grid-template-columns: repeat(4,minmax(0,1fr)); } }
+@media(min-width:1000px) { .slot-grid { grid-template-columns: repeat(6,minmax(0,1fr)); } .slot strong { font-size: 13px; } }
+.agenda-time { flex-direction: column; gap: 2px; }
