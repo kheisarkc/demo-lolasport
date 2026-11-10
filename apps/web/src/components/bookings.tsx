@@ -15,20 +15,30 @@ export function BookingCard({ booking, href }: { booking: Booking; href?: string
 export function BookingsPage({ staff = false }: { staff?: boolean }) { return staff ? <Guard roles={['staff']}><StaffBookings/></Guard> : <CustomerBookings/>; }
 
 /** Cek pesanan: pelanggan tanpa akun membuka pesanan dengan kode booking + nomor WhatsApp. */
-function LookupForm({ code = '', onFound }: { code?: string; onFound?: () => void }) {
+/** Kode boleh diketik tanpa "LS-" dan huruf kecil; spasi dibuang. */
+const normalizeCode = (value: string) => { const raw = value.toUpperCase().replace(/\s+/g, ''); return raw.startsWith('LS-') ? raw : `LS-${raw.length === 8 && raw.startsWith('LS') ? raw.slice(2) : raw}`; };
+/** Cek pesanan: pelanggan tanpa akun membuka pesanan dengan kode booking + nomor WhatsApp. */
+function LookupForm({ code = '', onFound, inline = false }: { code?: string; onFound?: () => void; inline?: boolean }) {
   const action = useAction(); const router = useRouter();
-  return <form className="surface stack" onSubmit={e => { e.preventDefault(); const form = new FormData(e.currentTarget); action.run(async () => { const result = await api<{ code: string; access_token: string }>('/bookings/lookup', 'POST', { code: form.get('code'), customer_phone: form.get('customer_phone') }); saveBookingToken(result.code, result.access_token); if (onFound && result.code === code.toUpperCase()) onFound(); else router.push(`/reservasi/${result.code}`); }); }}>
+  return <form className={`surface stack${inline ? ' lookup-card' : ''}`} onSubmit={e => { e.preventDefault(); const form = new FormData(e.currentTarget); action.run(async () => { const result = await api<{ code: string; access_token: string }>('/bookings/lookup', 'POST', { code: normalizeCode(String(form.get('code') || '')), customer_phone: form.get('customer_phone') }); saveBookingToken(result.code, result.access_token); if (onFound && result.code === code.toUpperCase()) onFound(); else router.push(`/reservasi/${result.code}`); }); }}>
     <Failure error={action.error}/>
-    <Field label="Kode booking" name="code" error={action.error}><input name="code" defaultValue={code} placeholder="LS-XXXXXX" autoCapitalize="characters" required maxLength={12}/></Field>
-    <Field label="Nomor WhatsApp" name="customer_phone" error={action.error}><input name="customer_phone" type="tel" inputMode="tel" autoComplete="tel" placeholder="08xxxxxxxxxx" required/></Field>
-    <button disabled={action.busy}>{action.busy ? 'Mencari…' : 'Buka pesanan'}</button></form>;
+    <div className="lookup-fields">
+      <Field label="Kode booking" name="code" error={action.error}><input name="code" defaultValue={code} placeholder="LS-XXXXXX" autoCapitalize="characters" autoComplete="off" spellCheck={false} required maxLength={12} onChange={e => { e.currentTarget.value = e.currentTarget.value.toUpperCase(); }}/></Field>
+      <Field label="Nomor WhatsApp" name="customer_phone" error={action.error}><input name="customer_phone" type="tel" inputMode="tel" autoComplete="tel" placeholder="08xxxxxxxxxx" required/></Field>
+      <button disabled={action.busy}>{action.busy ? 'Mencari…' : 'Buka pesanan'}</button>
+    </div></form>;
 }
 function CustomerBookings() {
-  const [state, setState] = useState<{ ready: boolean; bookings: Booking[] }>({ ready: false, bookings: [] });
-  useEffect(() => { let alive = true; const codes = Object.keys(bookingTokens()); Promise.all(codes.map(code => api<Booking>(`/bookings/${code}`).catch(() => null))).then(list => { if (alive) setState({ ready: true, bookings: list.filter((b): b is Booking => !!b).sort((a, b) => Date.parse(b.starts_at) - Date.parse(a.starts_at)) }); }); return () => { alive = false; }; }, []);
-  const lookup = <><div className="section-title"><h2>{state.bookings.length ? 'Pesanan lain' : 'Buka pesanan'}</h2></div><p className="muted">Pakai kode booking dan nomor WhatsApp saat memesan.</p><LookupForm/></>;
-  return <section className="narrow"><Heading title="Cek pesanan"/>
-    {!state.ready ? <Loading text="Memuat pesanan…"/> : state.bookings.length ? <><div className="section-title"><h2>Di perangkat ini</h2></div><div className="booking-list">{state.bookings.map(b => <BookingCard key={b.code} booking={b}/>)}</div>{lookup}</> : <>{lookup}<p className="muted">Belum pesan? <Link href="/">Lihat jadwal</Link></p></>}</section>;
+  const [state, setState] = useState<{ ready: boolean; bookings: Booking[] }>({ ready: false, bookings: [] }); const now = useNow();
+  useEffect(() => { let alive = true; const codes = Object.keys(bookingTokens()); Promise.all(codes.map(code => api<Booking>(`/bookings/${code}`).catch(() => null))).then(list => { if (alive) setState({ ready: true, bookings: list.filter((b): b is Booking => !!b) }); }); return () => { alive = false; }; }, []);
+  const upcoming = state.bookings.filter(b => holding(b.status) && Date.parse(b.ends_at) > now).sort((a, b) => Date.parse(a.starts_at) - Date.parse(b.starts_at));
+  const past = state.bookings.filter(b => !upcoming.includes(b)).sort((a, b) => Date.parse(b.starts_at) - Date.parse(a.starts_at));
+  return <section className="narrow"><Heading title="Cek pesanan" text="Masukkan kode booking dan nomor WhatsApp yang dipakai saat memesan."/><LookupForm inline/>
+    {!state.ready ? <Loading text="Memuat pesanan di perangkat ini…"/> : !state.bookings.length ? <p className="muted">Pesanan yang dibuat dari perangkat ini otomatis muncul di sini. Belum pesan? <Link href="/">Lihat jadwal</Link></p> : <>
+      <div className="section-title"><h2>Pesanan di perangkat ini</h2><span>{upcoming.length} akan datang</span></div>
+      {upcoming.length ? <div className="booking-list">{upcoming.map(b => <BookingCard key={b.code} booking={b}/>)}</div> : <p className="muted">Tidak ada jadwal yang akan datang. <Link href="/">Pesan lagi</Link></p>}
+      {!!past.length && <details className="past-bookings"><summary>Riwayat ({past.length})</summary><div className="booking-list">{past.map(b => <BookingCard key={b.code} booking={b}/>)}</div></details>}
+    </>}</section>;
 }
 function StaffBookings() {
   const resource = useResource<Booking[]>('/bookings'); const { params, update } = useQuery();

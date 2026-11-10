@@ -35,6 +35,14 @@ test('guest books without an account → staff verifies DP → cash settlement �
   await page.getByRole('button', { name: 'Buka pesanan', exact: true }).click();
   await expect(page.getByRole('heading', { name: 'Futsal Sintetis', exact: true })).toBeVisible();
   await expect(page.getByText('Bukti sedang diperiksa penjaga.', { exact: false })).toBeVisible();
+  // Cek pesanan: form ada di atas, kode boleh huruf kecil tanpa "LS-".
+  await page.evaluate(() => localStorage.clear());
+  await page.goto('/reservasi');
+  await page.getByLabel('Kode booking', { exact: true }).fill(code.slice(3).toLowerCase());
+  await page.getByLabel('Nomor WhatsApp', { exact: true }).fill('081234567890');
+  await page.getByRole('button', { name: 'Buka pesanan', exact: true }).click();
+  await expect(page).toHaveURL(new RegExp(`/reservasi/${code}$`));
+  await expect(page.getByText('Bukti sedang diperiksa penjaga.', { exact: false })).toBeVisible();
 
   await login(page, 'pegawai');
   await page.goto(`/pegawai/verifikasi/${code}`);

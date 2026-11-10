@@ -2160,3 +2160,11 @@ dialog .actions {
 @media(min-width:600px) { .slot-grid { grid-template-columns: repeat(4,minmax(0,1fr)); } }
 @media(min-width:1000px) { .slot-grid { grid-template-columns: repeat(6,minmax(0,1fr)); } .slot strong { font-size: 13px; } }
 .agenda-time { flex-direction: column; gap: 2px; }
+/* Cek pesanan: form di atas, satu baris di layar lebar. */
+.lookup-card { margin-bottom: 20px; }
+.lookup-fields { display: grid; gap: 12px; }
+.lookup-fields .field { margin: 0; }
+@media(min-width:600px) { .lookup-fields { grid-template-columns: 1fr 1fr auto; align-items: end; } .lookup-fields button { min-height: 48px; } }
+.past-bookings { margin-top: 16px; }
+.past-bookings summary { cursor: pointer; font-weight: 600; min-height: 44px; display: flex; align-items: center; }
+.past-bookings .booking-list { margin-top: 8px; }
