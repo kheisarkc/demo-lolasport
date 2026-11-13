@@ -29,21 +29,37 @@ export function useQuery() {
 }
 const resourceCache = new Map<string, unknown>();
 /** Hapus data tersimpan, misalnya saat ganti akun. */
-export const clearResourceCache = () => resourceCache.clear();
-/** Data terakhir untuk alamat yang sama langsung ditampilkan, lalu diperbarui diam-diam (tanpa layar memuat berulang). */
-export function useResource<T>(path: string | null) {
+export const clearResourceCache = () => { resourceCache.clear(); inflight.clear(); };
+const inflight = new Map<string, Promise<unknown>>();
+/** Satu permintaan per alamat: pemanggil yang datang belakangan ikut menunggu permintaan yang sama. */
+function load<T>(path: string) {
+  let request = inflight.get(path) as Promise<T> | undefined;
+  if (!request) {
+    request = api<T>(path).then(data => { resourceCache.set(path, data); return data; }).finally(() => inflight.delete(path));
+    inflight.set(path, request);
+  }
+  return request;
+}
+/** Mulai mengambil data lebih awal (misalnya bersamaan dengan cek sesi), hasilnya dipakai useResource. */
+export const prefetchResource = (path: string) => { if (!resourceCache.has(path)) load(path).catch(() => undefined); };
+/**
+ * Data terakhir untuk alamat yang sama langsung ditampilkan, lalu diperbarui diam-diam (tanpa layar memuat berulang).
+ * keepPrevious: saat alamat berganti (misalnya periode laporan), data lama tetap tampil sampai data baru datang.
+ */
+export function useResource<T>(path: string | null, { keepPrevious = false } = {}) {
   const [version, setVersion] = useState(0);
   const key = `${path}:${version}`;
   const [state, setState] = useState<{ key: string; data?: T; error?: Error }>({ key: '' });
   useEffect(() => {
     if (!path) return;
     let active = true;
-    api<T>(path).then(data => { resourceCache.set(path, data); if (active) setState({ key, data }); }).catch(error => { if (active) setState({ key, error }); });
+    load<T>(path).then(data => { if (active) setState({ key, data }); }).catch(error => { if (active) setState({ key, error }); });
     return () => { active = false; };
   }, [path, key]);
   const fresh = state.key === key;
-  const data = fresh ? state.data : path ? resourceCache.get(path) as T | undefined : undefined;
-  return { data, error: fresh ? state.error : undefined, loading: !!path && !fresh && data === undefined, refreshing: !!path && !fresh, refresh: useCallback(() => setVersion(v => v + 1), []) };
+  const cached = fresh ? state.data : path ? resourceCache.get(path) as T | undefined : undefined;
+  const data = cached ?? (keepPrevious && !(fresh && state.error) ? state.data : undefined);
+  return { data, error: fresh ? state.error : undefined, loading: !!path && !fresh && data === undefined, refreshing: !!path && !fresh, stale: cached === undefined && data !== undefined, refresh: useCallback(() => setVersion(v => v + 1), []) };
 }
 const everyMinute = (callback: () => void) => { const timer = setInterval(callback, 60000); return () => clearInterval(timer); };
 /** Tanggal hari ini dihitung di perangkat (halaman bisa disiapkan lebih dulu). Operasional: 00.00–00.59 masih hari sebelumnya. */

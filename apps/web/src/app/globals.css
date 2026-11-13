@@ -2168,3 +2168,7 @@ dialog .actions {
 .past-bookings { margin-top: 16px; }
 .past-bookings summary { cursor: pointer; font-weight: 600; min-height: 44px; display: flex; align-items: center; }
 .past-bookings .booking-list { margin-top: 8px; }
+
+/* Laporan: data lama tetap tampil (redup) saat periode baru dimuat. */
+.report-body { transition: opacity .15s ease; }
+.report-body.stale { opacity: .55; pointer-events: none; }
